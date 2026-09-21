@@ -38,3 +38,8 @@ crashlytics-build.properties
 .DS_Store
 *.slnx
 Parchment/.utmp/
+
+# Meta XR generated at Play time
+Parchment/RuntimeActionBindings.json
+Parchment/Assets/StreamingAssets/RuntimeActionBindings.json
+Parchment/Assets/StreamingAssets/RuntimeActionBindings.json.meta
