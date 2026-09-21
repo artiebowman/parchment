@@ -1229,6 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e118c20e5e4fd456382444f8307bbfd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SphereLoader
+  sphereMaterial: {fileID: 2100000, guid: 5259b721e17e745bf8ebc2495444c784, type: 2}
 --- !u!114 &2051825409
 MonoBehaviour:
   m_ObjectHideFlags: 0

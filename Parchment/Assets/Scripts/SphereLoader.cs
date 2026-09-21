@@ -3,6 +3,8 @@ using System.IO;
 
 public class SphereLoader : MonoBehaviour
 {
+    public Material sphereMaterial;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -21,6 +23,7 @@ public class SphereLoader : MonoBehaviour
             float d = float.Parse(parts[4]);
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.name = "Sphere_" + id;
+            sphere.GetComponent<Renderer>().sharedMaterial = sphereMaterial;
             sphere.transform.SetParent(transform, false);
             sphere.transform.localPosition = new Vector3(x, y, z);
             sphere.transform.localScale = new Vector3(d, d, d);
