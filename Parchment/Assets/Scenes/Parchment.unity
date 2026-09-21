@@ -1193,6 +1193,7 @@ GameObject:
   - component: {fileID: 2051825409}
   - component: {fileID: 2051825408}
   - component: {fileID: 2051825410}
+  - component: {fileID: 2051825411}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -1254,6 +1255,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 722568e94a9b94a868541a5841030888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialManager
+--- !u!114 &2051825411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051825406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 376cc9788c42747069723dece82a380b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EditorMouseRig
 --- !u!1 &2077525169
 GameObject:
   m_ObjectHideFlags: 0
