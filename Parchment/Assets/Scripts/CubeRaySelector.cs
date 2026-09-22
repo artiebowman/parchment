@@ -18,6 +18,12 @@ public class CubeRaySelector : MonoBehaviour
         {
             if (!hand.ConfirmedThisFrame) continue;
 
+            if (trial.RunFinished)
+            {
+                trial.StartNextRun();
+                return;
+            }
+
             RaycastHit hit;
             if (Physics.Raycast(hand.PointerRay, out hit, maxDistance))
             {

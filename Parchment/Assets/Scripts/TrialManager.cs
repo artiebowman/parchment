@@ -10,12 +10,37 @@ public class TrialManager : MonoBehaviour
     private Renderer currentTarget;
     private Color originalColor;
 
+    public Scoreboard board;
+    public int totalRuns = 7;
+    public bool RunFinished { get; private set; }
+
     void Start()
     {
         loader = GetComponent<SequenceLoader>();
+        StartRun(loader.runNumber);
+    }
+
+    public void StartRun(int run)
+    {
+        if (run > totalRuns)
+        {
+            board.ShowPrompt("All " + totalRuns + " runs complete");
+            return;
+        }
+
+        loader.runNumber = run;
         sequence = loader.GetSequence();
-        Debug.Log("TrialManager: first target is Sphere_" + sequence[0]);
+        currentIndex = 0;
+        running = false;
+        RunFinished = false;
         HighlightTarget();
+        board.ShowProgress(run, 1, sequence.Length);
+        Debug.Log("TrialManager: run " + run + " started, first target Sphere_" + sequence[0]);
+    }
+
+    public void StartNextRun()
+    {
+        StartRun(loader.runNumber + 1);
     }
 
     public void OnSphereSelected(int id)
@@ -42,8 +67,20 @@ public class TrialManager : MonoBehaviour
         {
             float elapsed = Time.time - startTime;
             running = false;
+            RunFinished = true;
+            board.ShowRunTime(loader.runNumber, elapsed);
             Debug.Log("TrialManager: run " + loader.runNumber + " complete in " + elapsed.ToString("F2") + " s");
         }
+        else
+        {
+            board.ShowProgress(loader.runNumber, currentIndex + 1, sequence.Length);
+        }
+    }
+
+    public bool IsCurrentTarget(int id)
+    {
+        if (currentIndex >= sequence.Length) return false;
+        return id == sequence[currentIndex];
     }
 
     private void HighlightTarget()

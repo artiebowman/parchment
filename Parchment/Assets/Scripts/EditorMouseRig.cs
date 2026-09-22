@@ -23,6 +23,12 @@ public class EditorMouseRig : MonoBehaviour
     {
         if (!Mouse.current.leftButton.wasPressedThisFrame) return;
 
+        if (trial.RunFinished)
+        {
+            trial.StartNextRun();
+            return;
+        }
+
         Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
