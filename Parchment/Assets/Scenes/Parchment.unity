@@ -1131,6 +1131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandPointer
   ConfirmedThisFrame: 0
   IsTracked: 0
+  HasIndexTip: 0
   pinchOnThreshold: 0.8
   pinchOffThreshold: 0.5
   cooldownSeconds: 0.15
@@ -2233,6 +2234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandPointer
   ConfirmedThisFrame: 0
   IsTracked: 0
+  HasIndexTip: 0
   pinchOnThreshold: 0.8
   pinchOffThreshold: 0.5
   cooldownSeconds: 0.15
@@ -2756,7 +2758,7 @@ Transform:
   m_GameObject: {fileID: 2020093374}
   serializedVersion: 2
   m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: 0, y: -0.45, z: -0.85}
+  m_LocalPosition: {x: 0, y: -0.55, z: -0.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2800,7 +2802,7 @@ Transform:
   m_GameObject: {fileID: 2051825406}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 1.2}
+  m_LocalPosition: {x: 0, y: 1.5, z: 1.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2921,6 +2923,8 @@ MonoBehaviour:
   bulbRadius: 0.015
   sheetHalfSize: 0.25
   lineGap: 0.02
+  nearDistance: 0.15
+  belowTolerance: 0.05
 --- !u!114 &2051825415
 MonoBehaviour:
   m_ObjectHideFlags: 0

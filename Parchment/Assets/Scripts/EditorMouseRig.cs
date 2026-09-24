@@ -6,6 +6,7 @@ public class EditorMouseRig : MonoBehaviour
     private Camera cam;
     private TrialManager trial;
     private ParchmentHover hover;
+    private bool wasFinishedLastFrame;
 
     void Start()
     {
@@ -27,7 +28,7 @@ public class EditorMouseRig : MonoBehaviour
 
         if (trial.RunFinished)
         {
-            trial.StartNextRun();
+            if (wasFinishedLastFrame) trial.StartNextRun();
             return;
         }
 
@@ -42,5 +43,10 @@ public class EditorMouseRig : MonoBehaviour
             int id = int.Parse(name.Substring(7));
             trial.OnSphereSelected(id);
         }
+    }
+
+    void LateUpdate()
+    {
+        wasFinishedLastFrame = trial.RunFinished;
     }
 }

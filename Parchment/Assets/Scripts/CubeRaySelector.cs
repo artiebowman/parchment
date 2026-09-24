@@ -4,9 +4,11 @@ public class CubeRaySelector : MonoBehaviour
 {
     public HandPointer[] hands;
     public float maxDistance = 5f;
-    public ParchmentHover hover;    // drag TaskCube here
+    public ParchmentHover hover;            // drag TaskCube here
+    public ParchmentSelector parchment;     // drag TaskCube here
 
     private TrialManager trial;
+    private bool wasFinishedLastFrame;      // run must be finished for a full frame before a pinch continues it
 
     void Awake()
     {
@@ -21,11 +23,12 @@ public class CubeRaySelector : MonoBehaviour
 
             if (trial.RunFinished)
             {
-                trial.StartNextRun();
+                if (wasFinishedLastFrame) trial.StartNextRun();   // ignore the pinch that finished the run
                 return;
             }
 
-            if (hover != null && hover.GetHovered(hand) != null) continue;   // this hand's pinch belongs to the parchment
+            if (parchment != null && parchment.SelectedThisFrame) return;   // sheet took this frame's pinch
+            if (hover != null && hover.IsOnSheet(hand)) continue;          // this hand is working the sheet, not the cube
 
             RaycastHit hit;
             if (Physics.Raycast(hand.PointerRay, out hit, maxDistance))
@@ -37,5 +40,10 @@ public class CubeRaySelector : MonoBehaviour
                 }
             }
         }
+    }
+
+    void LateUpdate()
+    {
+        wasFinishedLastFrame = trial.RunFinished;
     }
 }

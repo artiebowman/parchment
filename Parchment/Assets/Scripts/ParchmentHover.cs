@@ -15,9 +15,12 @@ public class ParchmentHover : MonoBehaviour
     public float bulbRadius = 0.015f;   // half the Bulb prefab's scale
     public float sheetHalfSize = 0.25f; // half the Slab's width; hits outside this are ignored
     public float lineGap = 0.02f;       // beam stops this far short of the coin
+    public float nearDistance = 0.15f;  // fingertip within this height above the sheet = near mode (ray off)
+    public float belowTolerance = 0.05f; // how far below the bulb plane a finger can dip and still count
 
-    // What each hand is currently hovering (null if none). Index matches hands[].
+    // Per hand, index matches hands[]: what it's hovering (null if none) and whether it's over the sheet at all.
     private Bulb[] hovered = new Bulb[0];
+    private bool[] onSheet = new bool[0];
 
     // Editor mouse acts like an extra hand.
     public Bulb MouseHovered { get; private set; }
@@ -29,6 +32,13 @@ public class ParchmentHover : MonoBehaviour
         return null;
     }
 
+    public bool IsOnSheet(HandPointer hand)
+    {
+        for (int i = 0; i < hands.Length; i++)
+            if (hands[i] == hand) return onSheet[i];
+        return false;
+    }
+
     public bool AnyHovered()
     {
         foreach (Bulb b in hovered) if (b != null) return true;
@@ -38,6 +48,7 @@ public class ParchmentHover : MonoBehaviour
     void OnEnable()
     {
         hovered = new Bulb[hands.Length];
+        onSheet = new bool[hands.Length];
     }
 
     void OnDisable()
@@ -46,6 +57,7 @@ public class ParchmentHover : MonoBehaviour
         if (MouseHovered != null) MouseHovered.SetState(Bulb.State.Idle);
 
         hovered = new Bulb[hands.Length];
+        onSheet = new bool[hands.Length];
         MouseHovered = null;
 
         foreach (GameObject r in reticles) if (r != null) r.SetActive(false);
@@ -69,14 +81,38 @@ public class ParchmentHover : MonoBehaviour
             GameObject reticle = i < reticles.Length ? reticles[i] : null;
 
             hovered[i] = null;
+            onSheet[i] = false;
             bool hit = false;
             Vector3 point = Vector3.zero;
             float dist = 0f;
 
             if (hand != null && hand.IsTracked)
             {
-                hovered[i] = FindNearest(hand.PointerRay, sheet, out hit, out point, out dist);
-                if (hit) hand.LineClip = Mathf.Min(hand.LineClip, dist - lineGap);
+                bool near = false;
+
+                if (hand.HasIndexTip)
+                {
+                    // Near mode: fingertip projected straight down onto the sheet, height ignored.
+                    float height = sheet.GetDistanceToPoint(hand.IndexTip);   // + above, - below
+                    Vector3 projected = sheet.ClosestPointOnPlane(hand.IndexTip);
+
+                    if (height <= nearDistance && height >= -belowTolerance && InsideSheet(projected))
+                    {
+                        near = true;
+                        hit = true;
+                        point = projected;
+                        hovered[i] = NearestBulb(projected, snapRadius);
+                        hand.LineClip = 0f;                 // no beam in near mode
+                    }
+                }
+
+                if (!near)
+                {
+                    hovered[i] = FindNearest(hand.PointerRay, sheet, out hit, out point, out dist);
+                    if (hit) hand.LineClip = Mathf.Min(hand.LineClip, dist - lineGap);
+                }
+
+                onSheet[i] = hit;
             }
 
             if (hovered[i] != null) current.Add(hovered[i]);
@@ -128,6 +164,12 @@ public class ParchmentHover : MonoBehaviour
         }
     }
 
+    bool InsideSheet(Vector3 worldPoint)
+    {
+        Vector3 local = parchment.InverseTransformPoint(worldPoint);
+        return Mathf.Abs(local.x) <= sheetHalfSize && Mathf.Abs(local.z) <= sheetHalfSize;
+    }
+
     Bulb FindNearest(Ray ray, Plane sheet, out bool hit, out Vector3 point, out float dist)
     {
         hit = false;
@@ -137,17 +179,19 @@ public class ParchmentHover : MonoBehaviour
         if (!sheet.Raycast(ray, out float enter)) return null;
 
         Vector3 p = ray.GetPoint(enter);
-
-        // Ignore hits that land outside the slab's edges (the plane itself is infinite).
-        Vector3 local = parchment.InverseTransformPoint(p);
-        if (Mathf.Abs(local.x) > sheetHalfSize || Mathf.Abs(local.z) > sheetHalfSize) return null;
+        if (!InsideSheet(p)) return null;   // the plane itself is infinite
 
         hit = true;
         dist = enter;
         point = p;
 
+        return NearestBulb(point, snapRadius);
+    }
+
+    Bulb NearestBulb(Vector3 point, float radius)
+    {
         Bulb best = null;
-        float bestDist = snapRadius;
+        float bestDist = radius;
 
         foreach (Transform child in scanner.bulbParent)
         {
