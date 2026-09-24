@@ -25,7 +25,7 @@ public class CubeRaySelector : MonoBehaviour
                 return;
             }
 
-            if (hover != null && hover.HoveredBulb != null) continue;   // parchment owns this pinch
+            if (hover != null && hover.GetHovered(hand) != null) continue;   // this hand's pinch belongs to the parchment
 
             RaycastHit hit;
             if (Physics.Raycast(hand.PointerRay, out hit, maxDistance))

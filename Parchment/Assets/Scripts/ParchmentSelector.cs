@@ -14,23 +14,26 @@ public class ParchmentSelector : MonoBehaviour
         if (hover == null || trial == null) return;
         if (trial.RunFinished) return;              // CubeRaySelector handles "pinch to continue"
 
-        Bulb bulb = hover.HoveredBulb;
-        if (bulb == null) return;
-
-        bool confirmed = false;
-
         foreach (HandPointer hand in hands)
         {
-            if (hand != null && hand.ConfirmedThisFrame) confirmed = true;
+            if (hand == null || !hand.ConfirmedThisFrame) continue;
+
+            Bulb bulb = hover.GetHovered(hand);
+            if (bulb != null)
+            {
+                trial.OnSphereSelected(bulb.id);
+            }
         }
 
 #if UNITY_EDITOR
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) confirmed = true;
-#endif
-
-        if (confirmed)
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            trial.OnSphereSelected(bulb.id);
+            Bulb bulb = hover.MouseHovered;
+            if (bulb != null)
+            {
+                trial.OnSphereSelected(bulb.id);
+            }
         }
+#endif
     }
 }

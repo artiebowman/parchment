@@ -1,84 +1,153 @@
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEngine.InputSystem;
 #endif
 
+[DefaultExecutionOrder(-50)]
 public class ParchmentHover : MonoBehaviour
 {
-    public HandPointer[] hands;         // drag both hand objects here
+    public HandPointer[] hands;         // drag Left then Right hand objects here
+    public GameObject[] reticles;       // drag Reticle_L then Reticle_R here (same order as hands)
     public Transform parchment;         // drag Parchment here
     public ParchmentScanner scanner;    // drag TaskCube here
-    public GameObject reticle;          // drag Reticle here
     public float snapRadius = 0.03f;
+    public float bulbRadius = 0.015f;   // half the Bulb prefab's scale
+    public float sheetHalfSize = 0.25f; // half the Slab's width; hits outside this are ignored
+    public float lineGap = 0.02f;       // beam stops this far short of the coin
 
-    public Bulb HoveredBulb { get; private set; }
-    public bool HasHitPoint { get; private set; }
-    public Vector3 HitPoint { get; private set; }
+    // What each hand is currently hovering (null if none). Index matches hands[].
+    private Bulb[] hovered = new Bulb[0];
+
+    // Editor mouse acts like an extra hand.
+    public Bulb MouseHovered { get; private set; }
+
+    public Bulb GetHovered(HandPointer hand)
+    {
+        for (int i = 0; i < hands.Length; i++)
+            if (hands[i] == hand) return hovered[i];
+        return null;
+    }
+
+    public bool AnyHovered()
+    {
+        foreach (Bulb b in hovered) if (b != null) return true;
+        return MouseHovered != null;
+    }
+
+    void OnEnable()
+    {
+        hovered = new Bulb[hands.Length];
+    }
 
     void OnDisable()
     {
-        if (HoveredBulb != null) HoveredBulb.SetState(Bulb.State.Idle);
-        HoveredBulb = null;
-        HasHitPoint = false;
-        if (reticle != null) reticle.SetActive(false);
+        foreach (Bulb b in hovered) if (b != null) b.SetState(Bulb.State.Idle);
+        if (MouseHovered != null) MouseHovered.SetState(Bulb.State.Idle);
+
+        hovered = new Bulb[hands.Length];
+        MouseHovered = null;
+
+        foreach (GameObject r in reticles) if (r != null) r.SetActive(false);
     }
 
     void Update()
     {
-        Bulb best = null;
-        float bestDist = snapRadius;
-        HasHitPoint = false;
+        // Plane through the bulb centers, not the slab surface, so a ray through a bulb lands on that bulb.
+        Vector3 planePoint = scanner.bulbParent.position + parchment.up * bulbRadius;
+        Plane sheet = new Plane(parchment.up, planePoint);
 
-        Plane sheet = new Plane(parchment.up, parchment.position);
+        HashSet<Bulb> previous = new HashSet<Bulb>();
+        foreach (Bulb b in hovered) if (b != null) previous.Add(b);
+        if (MouseHovered != null) previous.Add(MouseHovered);
 
-        foreach (HandPointer hand in hands)
+        HashSet<Bulb> current = new HashSet<Bulb>();
+
+        for (int i = 0; i < hands.Length; i++)
         {
-            if (hand == null || !hand.IsTracked) continue;
-            TryRay(hand.PointerRay, sheet, ref best, ref bestDist);
+            HandPointer hand = hands[i];
+            GameObject reticle = i < reticles.Length ? reticles[i] : null;
+
+            hovered[i] = null;
+            bool hit = false;
+            Vector3 point = Vector3.zero;
+            float dist = 0f;
+
+            if (hand != null && hand.IsTracked)
+            {
+                hovered[i] = FindNearest(hand.PointerRay, sheet, out hit, out point, out dist);
+                if (hit) hand.LineClip = Mathf.Min(hand.LineClip, dist - lineGap);
+            }
+
+            if (hovered[i] != null) current.Add(hovered[i]);
+
+            if (reticle != null)
+            {
+                reticle.SetActive(hit);
+                if (hit)
+                {
+                    reticle.transform.position = point;
+                    reticle.transform.rotation = parchment.rotation;
+                }
+            }
         }
 
+        MouseHovered = null;
 #if UNITY_EDITOR
-        if (hands.Length == 0 || !AnyHandTracked())
+        if (!AnyHandTracked())
         {
             Camera cam = Camera.main;
             if (cam != null && Mouse.current != null)
             {
                 Ray mouseRay = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-                TryRay(mouseRay, sheet, ref best, ref bestDist);
+                MouseHovered = FindNearest(mouseRay, sheet, out bool mHit, out Vector3 mPoint, out float _);
+                if (MouseHovered != null) current.Add(MouseHovered);
+
+                if (reticles.Length > 0 && reticles[0] != null)
+                {
+                    reticles[0].SetActive(mHit);
+                    if (mHit)
+                    {
+                        reticles[0].transform.position = mPoint;
+                        reticles[0].transform.rotation = parchment.rotation;
+                    }
+                }
             }
         }
 #endif
 
-        if (HoveredBulb != null && HoveredBulb != best)
-        {
-            HoveredBulb.SetState(Bulb.State.Idle);   // scanner re-colors it next frame
-        }
+        // Bulbs that were hovered last frame but aren't now go back to Idle.
+        foreach (Bulb b in previous)
+            if (!current.Contains(b)) b.SetState(Bulb.State.Idle);
 
-        HoveredBulb = best;
-
-        if (HoveredBulb != null)
+        // Color everything hovered now.
+        foreach (Bulb b in current)
         {
-            bool onTarget = scanner.trial != null && scanner.trial.IsCurrentTarget(HoveredBulb.id);
-            HoveredBulb.SetState(onTarget ? Bulb.State.HoverTarget : Bulb.State.Hover);
-        }
-
-        if (reticle != null)
-        {
-            reticle.SetActive(HasHitPoint);
-            if (HasHitPoint)
-            {
-                reticle.transform.position = HitPoint + parchment.up * 0.005f;
-            }
+            bool onTarget = scanner.trial != null && scanner.trial.IsCurrentTarget(b.id);
+            b.SetState(onTarget ? Bulb.State.HoverTarget : Bulb.State.Hover);
         }
     }
 
-    void TryRay(Ray ray, Plane sheet, ref Bulb best, ref float bestDist)
+    Bulb FindNearest(Ray ray, Plane sheet, out bool hit, out Vector3 point, out float dist)
     {
-        if (!sheet.Raycast(ray, out float enter)) return;
+        hit = false;
+        point = Vector3.zero;
+        dist = 0f;
 
-        Vector3 point = ray.GetPoint(enter);
-        HasHitPoint = true;
-        HitPoint = point;
+        if (!sheet.Raycast(ray, out float enter)) return null;
+
+        Vector3 p = ray.GetPoint(enter);
+
+        // Ignore hits that land outside the slab's edges (the plane itself is infinite).
+        Vector3 local = parchment.InverseTransformPoint(p);
+        if (Mathf.Abs(local.x) > sheetHalfSize || Mathf.Abs(local.z) > sheetHalfSize) return null;
+
+        hit = true;
+        dist = enter;
+        point = p;
+
+        Bulb best = null;
+        float bestDist = snapRadius;
 
         foreach (Transform child in scanner.bulbParent)
         {
@@ -93,6 +162,7 @@ public class ParchmentHover : MonoBehaviour
                 }
             }
         }
+        return best;
     }
 
     bool AnyHandTracked()

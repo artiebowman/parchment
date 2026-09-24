@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-100)]
 public class HandPointer : MonoBehaviour
 {
     private OVRHand hand;
@@ -7,6 +8,9 @@ public class HandPointer : MonoBehaviour
     [System.NonSerialized] public Ray PointerRay;
     public bool ConfirmedThisFrame;
     public bool IsTracked;
+
+    // Others can shorten the drawn line this frame (e.g. hover sets it to the sheet hit). Reset every frame.
+    [System.NonSerialized] public float LineClip = float.PositiveInfinity;
 
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
     [Range(0f, 1f)] public float pinchOffThreshold = 0.5f;
@@ -20,6 +24,7 @@ public class HandPointer : MonoBehaviour
     public TrialManager trial;
 
     private LineRenderer line;
+    private bool onTarget;
 
     void Awake()
     {
@@ -36,6 +41,7 @@ public class HandPointer : MonoBehaviour
     void Update()
     {
         ConfirmedThisFrame = false;
+        LineClip = float.PositiveInfinity;
         IsTracked = hand.IsTracked;
 
         if (!IsTracked)
@@ -48,10 +54,7 @@ public class HandPointer : MonoBehaviour
         Transform pose = hand.PointerPose;
         PointerRay = new Ray(pose.position, pose.forward);
 
-        line.SetPosition(0, PointerRay.origin);
-        line.SetPosition(1, PointerRay.origin + PointerRay.direction * rayLength);
-
-        bool onTarget = false;
+        onTarget = false;
         RaycastHit hit;
         if (Physics.Raycast(PointerRay, out hit, rayLength))
         {
@@ -59,9 +62,9 @@ public class HandPointer : MonoBehaviour
             {
                 int id = int.Parse(hit.collider.name.Substring(7));
                 onTarget = trial.IsCurrentTarget(id);
+                LineClip = hit.distance;
             }
         }
-        line.material.color = onTarget ? Color.green : Color.white;
 
         float strength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
 
@@ -81,5 +84,15 @@ public class HandPointer : MonoBehaviour
                 isPinching = false;
             }
         }
+    }
+
+    void LateUpdate()
+    {
+        if (!IsTracked) return;
+
+        float len = Mathf.Min(rayLength, LineClip);
+        line.SetPosition(0, PointerRay.origin);
+        line.SetPosition(1, PointerRay.origin + PointerRay.direction * len);
+        line.material.color = onTarget ? Color.green : Color.white;
     }
 }
