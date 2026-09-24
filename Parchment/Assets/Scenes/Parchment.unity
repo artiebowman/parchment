@@ -2263,6 +2263,7 @@ GameObject:
   - component: {fileID: 2051825412}
   - component: {fileID: 2051825413}
   - component: {fileID: 2051825414}
+  - component: {fileID: 2051825415}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -2394,6 +2395,23 @@ MonoBehaviour:
   scanner: {fileID: 2051825413}
   reticle: {fileID: 1153107164}
   snapRadius: 0.03
+--- !u!114 &2051825415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051825406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7367bf4f1dd894eb490ce828c0364c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParchmentSelector
+  hands:
+  - {fileID: 1113013150}
+  - {fileID: 824298946}
+  hover: {fileID: 2051825414}
+  trial: {fileID: 2051825410}
 --- !u!1 &2077525169
 GameObject:
   m_ObjectHideFlags: 0

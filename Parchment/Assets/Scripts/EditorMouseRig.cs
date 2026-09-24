@@ -5,6 +5,7 @@ public class EditorMouseRig : MonoBehaviour
 {
     private Camera cam;
     private TrialManager trial;
+    private ParchmentHover hover;
 
     void Start()
     {
@@ -16,6 +17,7 @@ public class EditorMouseRig : MonoBehaviour
 
         cam = Camera.main;
         trial = GetComponent<TrialManager>();
+        hover = GetComponent<ParchmentHover>();
         cam.transform.root.position = new Vector3(0f, 1.5f, -0.4f);
     }
 
@@ -28,6 +30,8 @@ public class EditorMouseRig : MonoBehaviour
             trial.StartNextRun();
             return;
         }
+
+        if (hover != null && hover.HoveredBulb != null) return;   // parchment owns this click
 
         Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (Physics.Raycast(ray, out RaycastHit hit))

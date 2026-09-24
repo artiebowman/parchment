@@ -4,6 +4,7 @@ public class CubeRaySelector : MonoBehaviour
 {
     public HandPointer[] hands;
     public float maxDistance = 5f;
+    public ParchmentHover hover;    // drag TaskCube here
 
     private TrialManager trial;
 
@@ -23,6 +24,8 @@ public class CubeRaySelector : MonoBehaviour
                 trial.StartNextRun();
                 return;
             }
+
+            if (hover != null && hover.HoveredBulb != null) continue;   // parchment owns this pinch
 
             RaycastHit hit;
             if (Physics.Raycast(hand.PointerRay, out hit, maxDistance))
