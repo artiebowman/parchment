@@ -13,6 +13,9 @@ public class ParchmentScanner : MonoBehaviour
 
     private readonly Dictionary<int, Bulb> bulbs = new Dictionary<int, Bulb>();
 
+    // The bulb matching the current target sphere, refreshed every frame. Feedback only.
+    public Bulb TargetBulb { get; private set; }
+
     void Start()
     {
         BuildGrid();
@@ -63,12 +66,17 @@ public class ParchmentScanner : MonoBehaviour
     {
         if (trial == null) return;
 
+        TargetBulb = null;
+
         foreach (var pair in bulbs)
         {
             Bulb bulb = pair.Value;
+            bool isTarget = trial.IsCurrentTarget(bulb.id);
+            if (isTarget) TargetBulb = bulb;
+
             if (bulb.IsHovered) continue;   // ParchmentHover owns both hover states
 
-            bulb.SetState(trial.IsCurrentTarget(bulb.id) ? Bulb.State.Target : Bulb.State.Idle);
+            bulb.SetState(isTarget ? Bulb.State.Target : Bulb.State.Idle);
         }
     }
 

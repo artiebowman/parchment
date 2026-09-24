@@ -21,6 +21,7 @@ public class HandPointer : MonoBehaviour
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
     [Range(0f, 1f)] public float pinchOffThreshold = 0.5f;
     public float cooldownSeconds = 0.15f;
+    public bool requireHighConfidence = true;   // ignore pinches from a poorly tracked hand
 
     private bool isPinching;
     private float nextAllowedTime;
@@ -55,6 +56,7 @@ public class HandPointer : MonoBehaviour
         if (!IsTracked)
         {
             line.enabled = false;
+            isPinching = false;
             return;
         }
         line.enabled = true;
@@ -81,11 +83,14 @@ public class HandPointer : MonoBehaviour
             }
         }
 
+        bool confident = !requireHighConfidence
+                         || hand.HandConfidence == OVRHand.TrackingConfidence.High;
+
         float strength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
 
         if (!isPinching)
         {
-            if (strength >= pinchOnThreshold && Time.time >= nextAllowedTime)
+            if (confident && strength >= pinchOnThreshold && Time.time >= nextAllowedTime)
             {
                 isPinching = true;
                 ConfirmedThisFrame = true;

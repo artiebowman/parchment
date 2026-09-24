@@ -626,7 +626,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.006}
+  m_AnchoredPosition: {x: 0, y: 0.008}
   m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &746938967
@@ -1135,6 +1135,7 @@ MonoBehaviour:
   pinchOnThreshold: 0.8
   pinchOffThreshold: 0.5
   cooldownSeconds: 0.15
+  requireHighConfidence: 1
   rayMaterial: {fileID: 2100000, guid: 0dbcbb6f0edeb467f9541d96d9227b5d, type: 2}
   rayLength: 2
   trial: {fileID: 2051825410}
@@ -1489,8 +1490,8 @@ Transform:
   m_GameObject: {fileID: 950544468}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.002, z: 0}
-  m_LocalScale: {x: 0.03, y: 0.002, z: 0.03}
+  m_LocalPosition: {x: 0, y: 0.003, z: 0}
+  m_LocalScale: {x: 0.03, y: 0.003, z: 0.03}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1189922535}
@@ -2238,6 +2239,7 @@ MonoBehaviour:
   pinchOnThreshold: 0.8
   pinchOffThreshold: 0.5
   cooldownSeconds: 0.15
+  requireHighConfidence: 1
   rayMaterial: {fileID: 2100000, guid: 0dbcbb6f0edeb467f9541d96d9227b5d, type: 2}
   rayLength: 2
   trial: {fileID: 2051825410}
@@ -2759,8 +2761,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: -0.55, z: -0.85}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1037796931}
   - {fileID: 1097558797}
@@ -2786,6 +2788,7 @@ GameObject:
   - component: {fileID: 2051825414}
   - component: {fileID: 2051825415}
   - component: {fileID: 2051825416}
+  - component: {fileID: 2051825417}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -2881,6 +2884,7 @@ MonoBehaviour:
   - {fileID: 824298946}
   maxDistance: 5
   hover: {fileID: 0}
+  parchment: {fileID: 0}
 --- !u!114 &2051825413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2958,6 +2962,29 @@ MonoBehaviour:
   hover: {fileID: 2051825414}
   selector: {fileID: 2051825415}
   startUnrolled: 1
+--- !u!114 &2051825417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051825406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d5861786a4bc44939ba27a562dcb050, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParchmentTether
+  hover: {fileID: 2051825414}
+  scanner: {fileID: 2051825413}
+  parchment: {fileID: 2020093375}
+  lineMaterial: {fileID: 2100000, guid: 0dbcbb6f0edeb467f9541d96d9227b5d, type: 2}
+  handColors:
+  - {r: 0.3, g: 0.65, b: 1, a: 1}
+  - {r: 1, g: 0.17, b: 0.17, a: 1}
+  width: 0.003
+  lift: 0.012
+  hideDistance: 0.05
+  fadeDistance: 0.15
 --- !u!1 &2077525169
 GameObject:
   m_ObjectHideFlags: 0
