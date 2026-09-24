@@ -18,6 +18,9 @@ public class HandPointer : MonoBehaviour
     // Others can shorten the drawn line this frame (e.g. hover sets it to the sheet hit). Reset every frame.
     [System.NonSerialized] public float LineClip = float.PositiveInfinity;
 
+    // Set each frame by ParchmentHover: true when the hand is below the sheet (at rest). Beam hidden.
+    [System.NonSerialized] public bool Resting;
+
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
     [Range(0f, 1f)] public float pinchOffThreshold = 0.5f;
     public float cooldownSeconds = 0.15f;
@@ -50,6 +53,7 @@ public class HandPointer : MonoBehaviour
     {
         ConfirmedThisFrame = false;
         LineClip = float.PositiveInfinity;
+        Resting = false;
         IsTracked = hand.IsTracked;
         HasIndexTip = false;
 
@@ -59,7 +63,6 @@ public class HandPointer : MonoBehaviour
             isPinching = false;
             return;
         }
-        line.enabled = true;
 
         Transform pose = hand.PointerPose;
         PointerRay = new Ray(pose.position, pose.forward);
@@ -111,7 +114,10 @@ public class HandPointer : MonoBehaviour
         if (!IsTracked) return;
 
         float len = Mathf.Min(rayLength, LineClip);
-        line.enabled = len > 0.01f;
+        bool show = !Resting && len > 0.01f;
+        line.enabled = show;
+        if (!show) return;
+
         line.SetPosition(0, PointerRay.origin);
         line.SetPosition(1, PointerRay.origin + PointerRay.direction * len);
         line.material.color = onTarget ? Color.green : Color.white;

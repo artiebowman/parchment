@@ -2761,7 +2761,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: -0.55, z: -0.85}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1037796931}
@@ -2805,7 +2805,7 @@ Transform:
   m_GameObject: {fileID: 2051825406}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 1.3}
+  m_LocalPosition: {x: 0, y: 1.5, z: 1.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2883,8 +2883,8 @@ MonoBehaviour:
   - {fileID: 1113013150}
   - {fileID: 824298946}
   maxDistance: 5
-  hover: {fileID: 0}
-  parchment: {fileID: 0}
+  hover: {fileID: 2051825414}
+  parchment: {fileID: 2051825415}
 --- !u!114 &2051825413
 MonoBehaviour:
   m_ObjectHideFlags: 0

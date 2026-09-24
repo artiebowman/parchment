@@ -88,6 +88,8 @@ public class ParchmentHover : MonoBehaviour
 
             if (hand != null && hand.IsTracked)
             {
+                hand.Resting = !sheet.GetSide(hand.PointerRay.origin);   // hand below the sheet = at rest
+
                 bool near = false;
 
                 if (hand.HasIndexTip)
@@ -177,6 +179,7 @@ public class ParchmentHover : MonoBehaviour
         dist = 0f;
 
         if (!sheet.Raycast(ray, out float enter)) return null;
+        if (!sheet.GetSide(ray.origin)) return null;   // hand is under the sheet; ignore
 
         Vector3 p = ray.GetPoint(enter);
         if (!InsideSheet(p)) return null;   // the plane itself is infinite

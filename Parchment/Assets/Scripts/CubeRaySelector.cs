@@ -4,8 +4,8 @@ public class CubeRaySelector : MonoBehaviour
 {
     public HandPointer[] hands;
     public float maxDistance = 5f;
-    public ParchmentHover hover;            // drag TaskCube here
-    public ParchmentSelector parchment;     // drag TaskCube here
+    public ParchmentHover hover;            // optional; found on this object if empty
+    public ParchmentSelector parchment;     // optional; found on this object if empty
 
     private TrialManager trial;
     private bool wasFinishedLastFrame;      // run must be finished for a full frame before a pinch continues it
@@ -13,6 +13,8 @@ public class CubeRaySelector : MonoBehaviour
     void Awake()
     {
         trial = GetComponent<TrialManager>();
+        if (hover == null) hover = GetComponent<ParchmentHover>();
+        if (parchment == null) parchment = GetComponent<ParchmentSelector>();
     }
 
     void Update()
