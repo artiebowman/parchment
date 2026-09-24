@@ -4,7 +4,7 @@ public class HandPointer : MonoBehaviour
 {
     private OVRHand hand;
 
-    public Ray PointerRay;
+    [System.NonSerialized] public Ray PointerRay;
     public bool ConfirmedThisFrame;
     public bool IsTracked;
 
