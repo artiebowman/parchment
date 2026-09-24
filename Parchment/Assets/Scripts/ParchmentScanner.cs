@@ -66,7 +66,7 @@ public class ParchmentScanner : MonoBehaviour
         foreach (var pair in bulbs)
         {
             Bulb bulb = pair.Value;
-            if (bulb.state == Bulb.State.Hover) continue;   // 3C owns hover
+            if (bulb.IsHovered) continue;   // ParchmentHover owns both hover states
 
             bulb.SetState(trial.IsCurrentTarget(bulb.id) ? Bulb.State.Target : Bulb.State.Idle);
         }

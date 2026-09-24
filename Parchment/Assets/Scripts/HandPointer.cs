@@ -6,6 +6,7 @@ public class HandPointer : MonoBehaviour
 
     public Ray PointerRay;
     public bool ConfirmedThisFrame;
+    public bool IsTracked;
 
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
     [Range(0f, 1f)] public float pinchOffThreshold = 0.5f;
@@ -35,8 +36,9 @@ public class HandPointer : MonoBehaviour
     void Update()
     {
         ConfirmedThisFrame = false;
+        IsTracked = hand.IsTracked;
 
-        if (!hand.IsTracked)
+        if (!IsTracked)
         {
             line.enabled = false;
             return;
