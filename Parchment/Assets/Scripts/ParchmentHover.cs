@@ -15,6 +15,14 @@ public class ParchmentHover : MonoBehaviour
     public bool HasHitPoint { get; private set; }
     public Vector3 HitPoint { get; private set; }
 
+    void OnDisable()
+    {
+        if (HoveredBulb != null) HoveredBulb.SetState(Bulb.State.Idle);
+        HoveredBulb = null;
+        HasHitPoint = false;
+        if (reticle != null) reticle.SetActive(false);
+    }
+
     void Update()
     {
         Bulb best = null;

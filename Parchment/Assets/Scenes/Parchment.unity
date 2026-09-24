@@ -2264,6 +2264,7 @@ GameObject:
   - component: {fileID: 2051825413}
   - component: {fileID: 2051825414}
   - component: {fileID: 2051825415}
+  - component: {fileID: 2051825416}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -2358,6 +2359,7 @@ MonoBehaviour:
   - {fileID: 1113013150}
   - {fileID: 824298946}
   maxDistance: 5
+  hover: {fileID: 0}
 --- !u!114 &2051825413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2412,6 +2414,22 @@ MonoBehaviour:
   - {fileID: 824298946}
   hover: {fileID: 2051825414}
   trial: {fileID: 2051825410}
+--- !u!114 &2051825416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051825406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beb94e23683da416191a9cc49d091136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParchmentMode
+  parchment: {fileID: 2020093374}
+  hover: {fileID: 2051825414}
+  selector: {fileID: 2051825415}
+  startUnrolled: 1
 --- !u!1 &2077525169
 GameObject:
   m_ObjectHideFlags: 0
