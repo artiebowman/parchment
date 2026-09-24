@@ -6,15 +6,21 @@ public class ParchmentScanner : MonoBehaviour
     public Transform taskCube;      // drag TaskCube here
     public Transform bulbParent;    // drag Bulbs here
     public GameObject bulbPrefab;   // drag the Bulb prefab here
+    public TrialManager trial;      // drag TaskCube here (it has TrialManager)
 
     public int columns = 10;
     public float spacing = 0.045f;
 
-    private readonly Dictionary<int, GameObject> bulbs = new Dictionary<int, GameObject>();
+    private readonly Dictionary<int, Bulb> bulbs = new Dictionary<int, Bulb>();
 
     void Start()
     {
         BuildGrid();
+    }
+
+    void Update()
+    {
+        RefreshStates();
     }
 
     void BuildGrid()
@@ -41,18 +47,33 @@ public class ParchmentScanner : MonoBehaviour
 
             Vector3 localPos = new Vector3(col * spacing - offset, 0f, offset - row * spacing);
 
-            GameObject bulb = Instantiate(bulbPrefab, bulbParent);
-            bulb.name = "Bulb_" + id;
-            bulb.transform.localPosition = localPos;
+            GameObject go = Instantiate(bulbPrefab, bulbParent);
+            go.name = "Bulb_" + id;
+            go.transform.localPosition = localPos;
 
+            Bulb bulb = go.GetComponent<Bulb>();
+            bulb.id = id;
             bulbs[id] = bulb;
         }
 
         Debug.Log("ParchmentScanner built " + bulbs.Count + " bulbs.");
     }
 
-    public GameObject GetBulb(int id)
+    void RefreshStates()
     {
-        return bulbs.TryGetValue(id, out GameObject b) ? b : null;
+        if (trial == null) return;
+
+        foreach (var pair in bulbs)
+        {
+            Bulb bulb = pair.Value;
+            if (bulb.state == Bulb.State.Hover) continue;   // 3C owns hover
+
+            bulb.SetState(trial.IsCurrentTarget(bulb.id) ? Bulb.State.Target : Bulb.State.Idle);
+        }
+    }
+
+    public Bulb GetBulb(int id)
+    {
+        return bulbs.TryGetValue(id, out Bulb b) ? b : null;
     }
 }

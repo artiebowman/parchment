@@ -2278,6 +2278,7 @@ MonoBehaviour:
   taskCube: {fileID: 2051825407}
   bulbParent: {fileID: 1097558797}
   bulbPrefab: {fileID: 5091420978869708625, guid: 5e3512595631f492aab5800aec784bb5, type: 3}
+  trial: {fileID: 2051825410}
   columns: 10
   spacing: 0.045
 --- !u!1 &2077525169

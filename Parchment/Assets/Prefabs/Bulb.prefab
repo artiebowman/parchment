@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9061096021473058971}
   - component: {fileID: 6514497326591257165}
   - component: {fileID: 2836068486356967051}
+  - component: {fileID: 8014234569862334901}
   m_Layer: 0
   m_Name: Bulb
   m_TagString: Untagged
@@ -112,3 +113,20 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8014234569862334901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5091420978869708625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5551422e81f44dd18b6f9f53414af74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bulb
+  id: 0
+  state: 0
+  idleColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  targetColor: {r: 0.2, g: 0.9, b: 0.3, a: 1}
+  hoverColor: {r: 1, g: 0.85, b: 0.2, a: 1}
