@@ -6,6 +6,7 @@ public class HandPointer : MonoBehaviour
     private OVRHand hand;
     private OVRSkeleton skeleton;
     private Transform indexTip;
+    private Transform wristBone, indexKnuckle, littleKnuckle;   // palm
 
     [System.NonSerialized] public Ray PointerRay;
     public bool ConfirmedThisFrame;
@@ -15,10 +16,19 @@ public class HandPointer : MonoBehaviour
     [System.NonSerialized] public Vector3 IndexTip;
     public bool HasIndexTip;
 
+    // Palm center and the direction the palm faces, valid only when HasPalm is true.
+    [System.NonSerialized] public Vector3 PalmCenter;
+    [System.NonSerialized] public Vector3 PalmNormal;
+    public bool HasPalm;
+    public bool PalmUp;                                  // palm facing the ceiling
+    public bool flipPalmNormal;                          // tick on whichever hand comes out mirrored
+    [Range(0f, 1f)] public float palmUpThreshold = 0.7f; // 1 = dead flat, lower = more forgiving
+
     // Others can shorten the drawn line this frame (e.g. hover sets it to the sheet hit). Reset every frame.
+    // Infinity means nothing clipped it, and the beam is not drawn.
     [System.NonSerialized] public float LineClip = float.PositiveInfinity;
 
-    // Set each frame by ParchmentHover: true when the hand is below the sheet (at rest). Beam hidden.
+    // Set each frame by ParchmentHover/PalmMenu: true when the hand is at rest or busy with the menu. Beam hidden.
     [System.NonSerialized] public bool Resting;
 
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
@@ -32,6 +42,8 @@ public class HandPointer : MonoBehaviour
     public Material rayMaterial;
     public float rayLength = 2f;
     public TrialManager trial;
+    public Transform cubeRoot;      // drag TaskCube here; beam shows when pointing into the cube's volume
+    public float cubeSize = 1f;
 
     private LineRenderer line;
     private bool onTarget;
@@ -56,6 +68,8 @@ public class HandPointer : MonoBehaviour
         Resting = false;
         IsTracked = hand.IsTracked;
         HasIndexTip = false;
+        HasPalm = false;
+        PalmUp = false;
 
         if (!IsTracked)
         {
@@ -67,11 +81,26 @@ public class HandPointer : MonoBehaviour
         Transform pose = hand.PointerPose;
         PointerRay = new Ray(pose.position, pose.forward);
 
-        if (indexTip == null) FindIndexTip();
+        if (indexTip == null) FindBones();
         if (indexTip != null)
         {
             IndexTip = indexTip.position;
             HasIndexTip = true;
+        }
+
+        // Palm: plane through wrist and the two outer knuckles; its normal is the way the palm faces.
+        if (wristBone != null && indexKnuckle != null && littleKnuckle != null)
+        {
+            Vector3 w = wristBone.position;
+            Vector3 toIndex = indexKnuckle.position - w;
+            Vector3 toLittle = littleKnuckle.position - w;
+
+            PalmCenter = (w + indexKnuckle.position + littleKnuckle.position) / 3f;
+            PalmNormal = Vector3.Cross(toIndex, toLittle).normalized;
+            if (flipPalmNormal) PalmNormal = -PalmNormal;
+
+            HasPalm = true;
+            PalmUp = Vector3.Dot(PalmNormal, Vector3.up) >= palmUpThreshold;
         }
 
         onTarget = false;
@@ -83,6 +112,21 @@ public class HandPointer : MonoBehaviour
                 int id = int.Parse(hit.collider.name.Substring(7));
                 onTarget = trial.IsCurrentTarget(id);
                 LineClip = hit.distance;
+            }
+        }
+
+        // No sphere under the ray: if the ray passes through the cube, run the beam to where it leaves the glass.
+        if (float.IsPositiveInfinity(LineClip) && cubeRoot != null)
+        {
+            Bounds box = new Bounds(cubeRoot.position, Vector3.one * cubeSize);
+            if (box.IntersectRay(PointerRay, out float enter) && enter <= rayLength)
+            {
+                // Fire a ray back from the far end to find the exit face.
+                Ray back = new Ray(PointerRay.origin + PointerRay.direction * rayLength, -PointerRay.direction);
+                if (box.IntersectRay(back, out float fromEnd))
+                    LineClip = rayLength - fromEnd;
+                else
+                    LineClip = enter;
             }
         }
 
@@ -114,7 +158,7 @@ public class HandPointer : MonoBehaviour
         if (!IsTracked) return;
 
         float len = Mathf.Min(rayLength, LineClip);
-        bool show = !Resting && len > 0.01f;
+        bool show = !Resting && len > 0.01f && !float.IsPositiveInfinity(LineClip);
         line.enabled = show;
         if (!show) return;
 
@@ -123,16 +167,25 @@ public class HandPointer : MonoBehaviour
         line.material.color = onTarget ? Color.green : Color.white;
     }
 
-    void FindIndexTip()
+    void FindBones()
     {
         if (skeleton == null || !skeleton.IsInitialized) return;
 
         // Bone ids collide across Meta's hand/body enums, so pick by index, not name.
-        // OpenXR hand skeleton (26 bones): index tip is bone 10. Legacy hand skeleton (24 bones): bone 20.
-        int tipIndex = skeleton.Bones.Count == 26 ? 10 : 20;
+        // OpenXR hand skeleton (26 bones): index tip 10, wrist 1, index knuckle 7, little knuckle 22.
+        // Legacy hand skeleton (24 bones): index tip 20, wrist 0, index knuckle 6, little knuckle 16.
+        bool openXR = skeleton.Bones.Count == 26;
+        int tipIndex     = openXR ? 10 : 20;
+        int wristIndex   = openXR ? 1  : 0;
+        int indexKIndex  = openXR ? 7  : 6;
+        int littleKIndex = openXR ? 22 : 16;
+
         if (tipIndex >= skeleton.Bones.Count) return;
 
         indexTip = skeleton.Bones[tipIndex].Transform;
+        wristBone = skeleton.Bones[wristIndex].Transform;
+        indexKnuckle = skeleton.Bones[indexKIndex].Transform;
+        littleKnuckle = skeleton.Bones[littleKIndex].Transform;
         Debug.Log(name + ": index tip bound to bone " + tipIndex);
     }
 }

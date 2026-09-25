@@ -14,6 +14,12 @@ public class ParchmentSelector : MonoBehaviour
     // True for the frame in which this selector sent a selection. CubeRaySelector yields that frame.
     public bool SelectedThisFrame { get; private set; }
 
+    // Called by the palm menu's Poke button.
+    public void TogglePoke()
+    {
+        pokeEnabled = !pokeEnabled;
+    }
+
     void Update()
     {
         SelectedThisFrame = false;
