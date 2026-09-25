@@ -2761,7 +2761,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: -0.55, z: -0.85}
-  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1037796931}
@@ -2789,6 +2789,7 @@ GameObject:
   - component: {fileID: 2051825415}
   - component: {fileID: 2051825416}
   - component: {fileID: 2051825417}
+  - component: {fileID: 2051825418}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -2805,7 +2806,7 @@ Transform:
   m_GameObject: {fileID: 2051825406}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 1.4}
+  m_LocalPosition: {x: 0, y: 1.5, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2925,6 +2926,7 @@ MonoBehaviour:
   scanner: {fileID: 2051825413}
   snapRadius: 0.03
   bulbRadius: 0.015
+  pressRadius: 0.02
   sheetHalfSize: 0.25
   lineGap: 0.02
   nearDistance: 0.15
@@ -2946,6 +2948,7 @@ MonoBehaviour:
   - {fileID: 824298946}
   hover: {fileID: 2051825414}
   trial: {fileID: 2051825410}
+  pokeEnabled: 1
 --- !u!114 &2051825416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2985,6 +2988,24 @@ MonoBehaviour:
   lift: 0.012
   hideDistance: 0.05
   fadeDistance: 0.15
+--- !u!114 &2051825418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051825406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1c97a4666e0d400ca71c61c4f7dd313, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParchmentFollow
+  parchment: {fileID: 2020093375}
+  head: {fileID: 878743753}
+  distance: 0.435
+  heightOffset: -0.225
+  tilt: 53
+  followSpeed: 4
 --- !u!1 &2077525169
 GameObject:
   m_ObjectHideFlags: 0
