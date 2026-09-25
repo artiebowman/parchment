@@ -13,6 +13,7 @@ public class ParchmentHover : MonoBehaviour
     public ParchmentScanner scanner;    // drag TaskCube here
     public float snapRadius = 0.03f;
     public float bulbRadius = 0.015f;   // half the Bulb prefab's scale
+    public float pressRadius = 0.02f;   // fingertip within this distance of a bulb center = pressing that bulb (a bit bigger than the glass)
     public float sheetHalfSize = 0.25f; // half the Slab's width; hits outside this are ignored
     public float lineGap = 0.02f;       // beam stops this far short of the coin
     public float nearDistance = 0.15f;  // fingertip within this height above the sheet = near mode (ray off)
@@ -21,6 +22,12 @@ public class ParchmentHover : MonoBehaviour
     // Per hand, index matches hands[]: what it's hovering (null if none) and whether it's over the sheet at all.
     private Bulb[] hovered = new Bulb[0];
     private bool[] onSheet = new bool[0];
+
+    // Poke-to-select, per hand. Like keys on a keyboard: entering a bulb's ball presses it, leaving releases it.
+    private Bulb[] pressing = new Bulb[0];        // bulb the tip is inside right now (null if none)
+    private bool[] pokedThisFrame = new bool[0];
+    private Bulb[] pokedBulb = new Bulb[0];
+    private float[] lastHeight = new float[0];    // tip height above the plane last frame; used to refuse entry from below
 
     // Editor mouse acts like an extra hand.
     public Bulb MouseHovered { get; private set; }
@@ -39,6 +46,30 @@ public class ParchmentHover : MonoBehaviour
         return false;
     }
 
+    // True on the single frame this hand's fingertip entered a bulb it wasn't inside before.
+    public bool PokedThisFrame(HandPointer hand)
+    {
+        for (int i = 0; i < hands.Length; i++)
+            if (hands[i] == hand) return pokedThisFrame[i];
+        return false;
+    }
+
+    // The bulb entered on that frame (null when no poke this frame).
+    public Bulb GetPoked(HandPointer hand)
+    {
+        for (int i = 0; i < hands.Length; i++)
+            if (hands[i] == hand) return pokedThisFrame[i] ? pokedBulb[i] : null;
+        return null;
+    }
+
+    // The bulb this hand's fingertip is currently inside, held down (null if none).
+    public Bulb IsPressing(HandPointer hand)
+    {
+        for (int i = 0; i < hands.Length; i++)
+            if (hands[i] == hand) return pressing[i];
+        return null;
+    }
+
     public bool AnyHovered()
     {
         foreach (Bulb b in hovered) if (b != null) return true;
@@ -47,8 +78,7 @@ public class ParchmentHover : MonoBehaviour
 
     void OnEnable()
     {
-        hovered = new Bulb[hands.Length];
-        onSheet = new bool[hands.Length];
+        ResetArrays();
     }
 
     void OnDisable()
@@ -56,11 +86,22 @@ public class ParchmentHover : MonoBehaviour
         foreach (Bulb b in hovered) if (b != null) b.SetState(Bulb.State.Idle);
         if (MouseHovered != null) MouseHovered.SetState(Bulb.State.Idle);
 
-        hovered = new Bulb[hands.Length];
-        onSheet = new bool[hands.Length];
+        ResetArrays();
         MouseHovered = null;
 
         foreach (GameObject r in reticles) if (r != null) r.SetActive(false);
+    }
+
+    void ResetArrays()
+    {
+        int n = hands.Length;
+        hovered = new Bulb[n];
+        onSheet = new bool[n];
+        pressing = new Bulb[n];
+        pokedThisFrame = new bool[n];
+        pokedBulb = new Bulb[n];
+        lastHeight = new float[n];
+        for (int i = 0; i < n; i++) lastHeight[i] = float.NegativeInfinity;   // "unknown" = treat as from below, no poke
     }
 
     void Update()
@@ -82,6 +123,8 @@ public class ParchmentHover : MonoBehaviour
 
             hovered[i] = null;
             onSheet[i] = false;
+            pokedThisFrame[i] = false;
+            pokedBulb[i] = null;
             bool hit = false;
             Vector3 point = Vector3.zero;
             float dist = 0f;
@@ -94,10 +137,10 @@ public class ParchmentHover : MonoBehaviour
 
                 if (hand.HasIndexTip)
                 {
-                    // Near mode: fingertip projected straight down onto the sheet, height ignored.
                     float height = sheet.GetDistanceToPoint(hand.IndexTip);   // + above, - below
                     Vector3 projected = sheet.ClosestPointOnPlane(hand.IndexTip);
 
+                    // Near mode: fingertip projected straight down onto the sheet, height ignored.
                     if (height <= nearDistance && height >= -belowTolerance && InsideSheet(projected))
                     {
                         near = true;
@@ -106,6 +149,25 @@ public class ParchmentHover : MonoBehaviour
                         hovered[i] = NearestBulb(projected, snapRadius);
                         hand.LineClip = 0f;                 // no beam in near mode
                     }
+
+                    // Press: which bulb's ball is the tip inside right now? Only meaningful in near mode.
+                    Bulb inside = near ? NearestBulb(hand.IndexTip, pressRadius) : null;
+
+                    // Entering a bulb we weren't inside last frame is a poke, unless we came up from under the sheet.
+                    bool cameFromBelow = lastHeight[i] < -belowTolerance;
+                    if (inside != null && inside != pressing[i] && !cameFromBelow)
+                    {
+                        pokedThisFrame[i] = true;
+                        pokedBulb[i] = inside;
+                    }
+
+                    pressing[i] = inside;
+                    lastHeight[i] = height;
+                }
+                else
+                {
+                    pressing[i] = null;
+                    lastHeight[i] = float.NegativeInfinity;   // lost the tip; whatever it reappears inside doesn't count
                 }
 
                 if (!near)
@@ -115,6 +177,11 @@ public class ParchmentHover : MonoBehaviour
                 }
 
                 onSheet[i] = hit;
+            }
+            else
+            {
+                pressing[i] = null;
+                lastHeight[i] = float.NegativeInfinity;
             }
 
             if (hovered[i] != null) current.Add(hovered[i]);
@@ -191,6 +258,8 @@ public class ParchmentHover : MonoBehaviour
         return NearestBulb(point, snapRadius);
     }
 
+    // Nearest bulb center to a world point, within radius. Works in 3D, so it serves both
+    // the hover snap (point on the plane) and the press check (the fingertip itself).
     Bulb NearestBulb(Vector3 point, float radius)
     {
         Bulb best = null;

@@ -9,6 +9,7 @@ public class ParchmentSelector : MonoBehaviour
     public HandPointer[] hands;     // drag both hand objects here
     public ParchmentHover hover;    // drag TaskCube here
     public TrialManager trial;      // drag TaskCube here
+    public bool pokeEnabled = true; // fingertip entering a bulb selects it; pinch always works regardless
 
     // True for the frame in which this selector sent a selection. CubeRaySelector yields that frame.
     public bool SelectedThisFrame { get; private set; }
@@ -22,13 +23,31 @@ public class ParchmentSelector : MonoBehaviour
 
         foreach (HandPointer hand in hands)
         {
-            if (hand == null || !hand.ConfirmedThisFrame) continue;
+            if (hand == null) continue;
 
-            Bulb bulb = hover.GetHovered(hand);
-            if (bulb != null)
+            bool sent = false;
+
+            // Pinch: selects whatever this hand is hovering.
+            if (hand.ConfirmedThisFrame)
             {
-                trial.OnSphereSelected(bulb.id);
-                SelectedThisFrame = true;
+                Bulb bulb = hover.GetHovered(hand);
+                if (bulb != null)
+                {
+                    trial.OnSphereSelected(bulb.id);
+                    SelectedThisFrame = true;
+                    sent = true;
+                }
+            }
+
+            // Poke: selects the bulb the fingertip just entered. Skipped if the pinch already sent one this frame.
+            if (pokeEnabled && !sent && hover.PokedThisFrame(hand))
+            {
+                Bulb bulb = hover.GetPoked(hand);
+                if (bulb != null)
+                {
+                    trial.OnSphereSelected(bulb.id);
+                    SelectedThisFrame = true;
+                }
             }
         }
 
