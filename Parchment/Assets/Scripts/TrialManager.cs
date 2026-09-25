@@ -7,6 +7,7 @@ public class TrialManager : MonoBehaviour
     private int currentIndex = 0;
     private float startTime;
     private bool running = false;
+    private bool hasStarted = false;    // false until the first run is kicked off by a pinch
     private Renderer currentTarget;
     private Color originalColor;
 
@@ -17,7 +18,10 @@ public class TrialManager : MonoBehaviour
     void Start()
     {
         loader = GetComponent<SequenceLoader>();
-        StartRun(loader.runNumber);
+
+        // Wait for a pinch before run 1, same as between runs. Nothing is highlighted yet.
+        RunFinished = true;
+        board.ShowPrompt("Pinch to start");
     }
 
     public void StartRun(int run)
@@ -32,6 +36,7 @@ public class TrialManager : MonoBehaviour
         sequence = loader.GetSequence();
         currentIndex = 0;
         running = false;
+        hasStarted = true;
         RunFinished = false;
         HighlightTarget();
         board.ShowProgress(run, 1, sequence.Length);
@@ -40,11 +45,13 @@ public class TrialManager : MonoBehaviour
 
     public void StartNextRun()
     {
-        StartRun(loader.runNumber + 1);
+        if (!hasStarted) StartRun(loader.runNumber);   // first pinch starts whatever run the slider is on
+        else StartRun(loader.runNumber + 1);
     }
 
     public void OnSphereSelected(int id)
     {
+        if (sequence == null) return;
         if (currentIndex >= sequence.Length) return;
 
         if (id != sequence[currentIndex])
@@ -79,6 +86,7 @@ public class TrialManager : MonoBehaviour
 
     public bool IsCurrentTarget(int id)
     {
+        if (sequence == null) return false;
         if (currentIndex >= sequence.Length) return false;
         return id == sequence[currentIndex];
     }
