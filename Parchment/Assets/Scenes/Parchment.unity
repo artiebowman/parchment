@@ -3540,6 +3540,7 @@ MonoBehaviour:
   parchment: {fileID: 2020093374}
   hover: {fileID: 2051825414}
   selector: {fileID: 2051825415}
+  menu: {fileID: 2051825419}
   startUnrolled: 0
 --- !u!114 &2051825417
 MonoBehaviour:
@@ -3618,7 +3619,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0f8ea04c64c4a07a656377720e4c45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioFeedback
-  clickVolume: 0.02
+  clickVolume: 0.03
+  blipVolume: 0.25
   dingVolume: 0.5
   clickMinGap: 0.025
   clickFullGap: 0.15

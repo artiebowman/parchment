@@ -16,6 +16,9 @@ public class PalmMenu : MonoBehaviour
     public float followSpeed = 10f;
     [Range(0f, 1f)] public float palmToFaceThreshold = 0.5f;   // palm turned this much toward the head hides its beam
 
+    // True while the panel is visible. Others (ParchmentMode) defer actions until this drops.
+    public bool IsShown => shown;
+
     private float upSince = -1f;
     private float downSince = -1f;
     private bool shown;
