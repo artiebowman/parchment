@@ -1685,6 +1685,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandPointer
   ConfirmedThisFrame: 0
   IsTracked: 0
+  rayFromFingertip: 0
   HasIndexTip: 0
   HasPalm: 0
   PalmUp: 0
@@ -3121,6 +3122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandPointer
   ConfirmedThisFrame: 0
   IsTracked: 0
+  rayFromFingertip: 0
   HasIndexTip: 0
   HasPalm: 0
   PalmUp: 0

@@ -15,6 +15,10 @@ public class HandPointer : MonoBehaviour
     public bool ConfirmedThisFrame;
     public bool IsTracked;
 
+    // Beam starts at the index fingertip (direction still comes from Meta's stabilized pointer pose).
+    // Off = beam starts at the pointer pose near the wrist, matching Meta's system UI. Tried on, rejected: felt like it leaned.
+    public bool rayFromFingertip = false;
+
     // Index fingertip in world space, valid only when HasIndexTip is true.
     [System.NonSerialized] public Vector3 IndexTip;
     public bool HasIndexTip;
@@ -89,6 +93,9 @@ public class HandPointer : MonoBehaviour
         {
             IndexTip = indexTip.position;
             HasIndexTip = true;
+
+            // Same aim, but the beam leaves from the fingertip instead of passing through the hand.
+            if (rayFromFingertip) PointerRay = new Ray(IndexTip, pose.forward);
         }
 
         // Palm: plane through wrist and the two outer knuckles; its normal is the way the palm faces.
