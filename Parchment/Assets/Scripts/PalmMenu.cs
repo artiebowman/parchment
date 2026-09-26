@@ -12,6 +12,7 @@ public class PalmMenu : MonoBehaviour
     public float maxReach = 0.75f;          // palm must be within this distance of the head
     public float showDelay = 0.25f;         // palm must be up this long before the menu appears
     public float hideDelay = 0.40f;         // and down this long before it goes away
+    public float confirmGrace = 0.3f;       // pinches stay ignored this long after the palm drops / menu closes
     public float followSpeed = 10f;
     [Range(0f, 1f)] public float palmToFaceThreshold = 0.5f;   // palm turned this much toward the head hides its beam
 
@@ -58,6 +59,10 @@ public class PalmMenu : MonoBehaviour
             if (downSince < 0f) downSince = Time.time;
             if (shown && Time.time - downSince >= hideDelay) SetShown(false);
         }
+
+        // While the menu pose is held or the panel is up, pinches are not game confirms (plus a short grace after).
+        if (palmReady || shown)
+            HandPointer.SuppressConfirmUntil = Time.time + confirmGrace;
 
         if (!shown) return;
         if (menuHand != null) menuHand.Resting = true;

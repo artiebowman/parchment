@@ -1,54 +1,82 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+// Anything a MenuButton can display on/off state for.
+public interface IToggleState
+{
+    bool IsOn { get; }
+}
+
 public class MenuButton : MonoBehaviour
 {
     public float pressRadius = 0.025f;       // fingertip within this of the button center = pressing
-    public Color idleColor = new Color(0.25f, 0.25f, 0.28f);
+    public float releaseRadius = 0.05f;      // once pressed, the tip must get this far away to re-arm (punch-through stays inside)
+    public float rearmSeconds = 0.3f;        // and this long must have passed since the press
+    public Color idleColor = new Color(0.25f, 0.25f, 0.28f);   // used only when there is no stateSource
+    public Color onColor = new Color(0.2f, 0.8f, 0.3f);        // feature on = solid green
+    public Color offColor = new Color(0.16f, 0.16f, 0.18f);    // feature off = dim gray
     public Color pressedColor = new Color(0.95f, 0.8f, 0.2f);
     public float flashSeconds = 0.15f;
     public UnityEvent onPress;                // wire the action here in the inspector
+    public MonoBehaviour stateSource;         // optional: drag a component that implements IToggleState
 
     [System.NonSerialized] public HandPointer[] hands = new HandPointer[0];   // set by PalmMenu each frame
 
     private Renderer rend;
-    private HandPointer insideHand;           // the hand currently pressing (null = none)
+    private IToggleState state;
+    private HandPointer heldBy;               // the hand that pressed and hasn't re-armed yet (null = armed)
+    private float pressedAt = float.NegativeInfinity;
     private float flashUntil;
 
     void Awake()
     {
         rend = GetComponent<Renderer>();
-        if (rend != null) rend.material.color = idleColor;
+        state = stateSource as IToggleState;
+        if (stateSource != null && state == null)
+            Debug.LogWarning($"MenuButton {name}: stateSource does not implement IToggleState");
+        if (rend != null) rend.material.color = RestColor();
     }
 
     void OnDisable()
     {
-        insideHand = null;
+        heldBy = null;
     }
 
     void Update()
     {
-        HandPointer nowInside = null;
-
-        foreach (HandPointer hand in hands)
+        // Re-arm: the holding hand has backed off far enough (or vanished) and enough time has passed.
+        if (heldBy != null && Time.time - pressedAt >= rearmSeconds)
         {
-            if (hand == null || !hand.IsTracked || !hand.HasIndexTip) continue;
-            if (Vector3.Distance(hand.IndexTip, transform.position) <= pressRadius)
+            bool gone = !heldBy.IsTracked || !heldBy.HasIndexTip ||
+                        Vector3.Distance(heldBy.IndexTip, transform.position) > releaseRadius;
+            if (gone) heldBy = null;
+        }
+
+        // Armed: any tip entering the press bubble fires once.
+        if (heldBy == null)
+        {
+            foreach (HandPointer hand in hands)
             {
-                nowInside = hand;
-                break;
+                if (hand == null || !hand.IsTracked || !hand.HasIndexTip) continue;
+                if (Vector3.Distance(hand.IndexTip, transform.position) <= pressRadius)
+                {
+                    heldBy = hand;
+                    pressedAt = Time.time;
+                    flashUntil = Time.time + flashSeconds;
+                    onPress.Invoke();
+                    break;
+                }
             }
         }
 
-        // Entering counts once; you have to leave and come back to press again.
-        if (nowInside != null && nowInside != insideHand)
-        {
-            flashUntil = Time.time + flashSeconds;
-            onPress.Invoke();
-        }
-        insideHand = nowInside;
-
         if (rend != null)
-            rend.material.color = Time.time < flashUntil ? pressedColor : idleColor;
+            rend.material.color = Time.time < flashUntil ? pressedColor : RestColor();
+    }
+
+    // What the button looks like when not being pressed.
+    Color RestColor()
+    {
+        if (state == null) return idleColor;
+        return state.IsOn ? onColor : offColor;
     }
 }

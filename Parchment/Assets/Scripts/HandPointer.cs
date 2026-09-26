@@ -3,6 +3,9 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public class HandPointer : MonoBehaviour
 {
+    // Shared by all hands: no pinch counts as a confirm until this time. PalmMenu pushes it forward while open.
+    public static float SuppressConfirmUntil = float.NegativeInfinity;
+
     private OVRHand hand;
     private OVRSkeleton skeleton;
     private Transform indexTip;
@@ -134,14 +137,18 @@ public class HandPointer : MonoBehaviour
                          || hand.HandConfidence == OVRHand.TrackingConfidence.High;
 
         float strength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
+        bool suppressed = Time.time < SuppressConfirmUntil;   // menu is up (or just closed): pinches are not confirms
 
         if (!isPinching)
         {
             if (confident && strength >= pinchOnThreshold && Time.time >= nextAllowedTime)
             {
-                isPinching = true;
-                ConfirmedThisFrame = true;
-                nextAllowedTime = Time.time + cooldownSeconds;
+                isPinching = true;                             // track the pinch either way so it can't fire when suppression ends
+                if (!suppressed)
+                {
+                    ConfirmedThisFrame = true;
+                    nextAllowedTime = Time.time + cooldownSeconds;
+                }
             }
         }
         else

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-public class ParchmentMode : MonoBehaviour
+public class ParchmentMode : MonoBehaviour, IToggleState
 {
     public GameObject parchment;        // drag Parchment here
     public ParchmentHover hover;        // drag TaskCube here
@@ -12,6 +12,9 @@ public class ParchmentMode : MonoBehaviour
     public bool startUnrolled = true;
 
     public bool Unrolled { get; private set; }
+
+    // IToggleState: the menu button shows green when the sheet is unrolled.
+    public bool IsOn => Unrolled;
 
     void Start()
     {

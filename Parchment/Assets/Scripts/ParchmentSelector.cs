@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 #endif
 
 [DefaultExecutionOrder(-10)]   // before CubeRaySelector, so "pinch to continue" can't also select here
-public class ParchmentSelector : MonoBehaviour
+public class ParchmentSelector : MonoBehaviour, IToggleState
 {
     public HandPointer[] hands;     // drag both hand objects here
     public ParchmentHover hover;    // drag TaskCube here
@@ -13,6 +13,9 @@ public class ParchmentSelector : MonoBehaviour
 
     // True for the frame in which this selector sent a selection. CubeRaySelector yields that frame.
     public bool SelectedThisFrame { get; private set; }
+
+    // IToggleState: the menu button shows green when poke is enabled.
+    public bool IsOn => pokeEnabled;
 
     // Called by the palm menu's Poke button.
     public void TogglePoke()
