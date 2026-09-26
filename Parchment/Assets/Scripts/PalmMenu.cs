@@ -13,6 +13,7 @@ public class PalmMenu : MonoBehaviour
     public float showDelay = 0.25f;         // palm must be up this long before the menu appears
     public float hideDelay = 0.40f;         // and down this long before it goes away
     public float followSpeed = 10f;
+    [Range(0f, 1f)] public float palmToFaceThreshold = 0.5f;   // palm turned this much toward the head hides its beam
 
     private float upSince = -1f;
     private float downSince = -1f;
@@ -35,6 +36,10 @@ public class PalmMenu : MonoBehaviour
         Transform h = head;
         if (h == null && Camera.main != null) h = Camera.main.transform;
         if (h == null) return;
+
+        // A palm turned toward your face is never pointing at anything: no beam from that hand.
+        HidePalmFacingBeam(menuHand, h);
+        HidePalmFacingBeam(pressHand, h);
 
         bool palmReady = menuHand.IsTracked && menuHand.HasPalm && menuHand.PalmUp
                          && menuHand.PalmCenter.y <= h.position.y - minBelowEyes
@@ -69,6 +74,13 @@ public class PalmMenu : MonoBehaviour
         // Only the other hand presses buttons.
         HandPointer[] pressers = pressHand != null ? new HandPointer[] { pressHand } : new HandPointer[0];
         foreach (MenuButton b in buttons) b.hands = pressers;
+    }
+
+    void HidePalmFacingBeam(HandPointer hand, Transform h)
+    {
+        if (hand == null || !hand.IsTracked || !hand.HasPalm) return;
+        Vector3 toHead = (h.position - hand.PalmCenter).normalized;
+        if (Vector3.Dot(hand.PalmNormal, toHead) >= palmToFaceThreshold) hand.Resting = true;
     }
 
     void SetShown(bool value)

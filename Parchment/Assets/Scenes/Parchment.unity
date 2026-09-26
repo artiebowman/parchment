@@ -1152,6 +1152,7 @@ GameObject:
   - component: {fileID: 824298940}
   - component: {fileID: 824298939}
   - component: {fileID: 824298946}
+  - component: {fileID: 824298947}
   m_Layer: 0
   m_Name: '[BuildingBlock] Hand Tracking right'
   m_TagString: Untagged
@@ -1199,7 +1200,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: aa70c70787230f248b33d8a0ce1a6c3d, type: 2}
+  - {fileID: 2100000, guid: e791550b311a4430fa0675dee47edc98, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1250,7 +1251,7 @@ MonoBehaviour:
   _ovrSkeleton: {fileID: 0}
   _confidenceBehavior: 1
   _systemGestureBehavior: 1
-  _systemGestureMaterial: {fileID: 2100000, guid: 9d107f2f043e1ed408b970f146718017, type: 2}
+  _systemGestureMaterial: {fileID: 2100000, guid: e791550b311a4430fa0675dee47edc98, type: 2}
 --- !u!114 &824298941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1350,7 +1351,7 @@ MonoBehaviour:
   HasIndexTip: 0
   HasPalm: 0
   PalmUp: 0
-  flipPalmNormal: 0
+  flipPalmNormal: 1
   palmUpThreshold: 0.7
   pinchOnThreshold: 0.8
   pinchOffThreshold: 0.5
@@ -1361,6 +1362,23 @@ MonoBehaviour:
   trial: {fileID: 2051825410}
   cubeRoot: {fileID: 2051825407}
   cubeSize: 1
+--- !u!114 &824298947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 824298937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000b916b0eca54e0e8d8e0b1c2cce7a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandTint
+  pointer: {fileID: 0}
+  handRenderer: {fileID: 824298939}
+  idleColor: {r: 1, g: 1, b: 1, a: 0.9019608}
+  palmUpColor: {r: 0.2509804, g: 0.5019608, b: 1, a: 0.9019608}
+  blendSpeed: 12
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2565,6 +2583,7 @@ GameObject:
   - component: {fileID: 1113013144}
   - component: {fileID: 1113013143}
   - component: {fileID: 1113013150}
+  - component: {fileID: 1113013151}
   m_Layer: 0
   m_Name: '[BuildingBlock] Hand Tracking left'
   m_TagString: Untagged
@@ -2612,7 +2631,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: aa70c70787230f248b33d8a0ce1a6c3d, type: 2}
+  - {fileID: 2100000, guid: dd8f778108b4347c79c525ce5c5eff67, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2663,7 +2682,7 @@ MonoBehaviour:
   _ovrSkeleton: {fileID: 0}
   _confidenceBehavior: 1
   _systemGestureBehavior: 1
-  _systemGestureMaterial: {fileID: 2100000, guid: 9d107f2f043e1ed408b970f146718017, type: 2}
+  _systemGestureMaterial: {fileID: 2100000, guid: dd8f778108b4347c79c525ce5c5eff67, type: 2}
 --- !u!114 &1113013145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2774,6 +2793,23 @@ MonoBehaviour:
   trial: {fileID: 2051825410}
   cubeRoot: {fileID: 2051825407}
   cubeSize: 1
+--- !u!114 &1113013151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113013141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000b916b0eca54e0e8d8e0b1c2cce7a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandTint
+  pointer: {fileID: 0}
+  handRenderer: {fileID: 1113013143}
+  idleColor: {r: 1, g: 1, b: 1, a: 0.9019608}
+  palmUpColor: {r: 0.2509804, g: 0.5019608, b: 1, a: 0.9019608}
+  blendSpeed: 12
 --- !u!1 &1137256573
 GameObject:
   m_ObjectHideFlags: 0
@@ -3560,6 +3596,7 @@ MonoBehaviour:
   showDelay: 0.25
   hideDelay: 0.4
   followSpeed: 10
+  palmToFaceThreshold: 0.5
 --- !u!1 &2069883850
 GameObject:
   m_ObjectHideFlags: 0
