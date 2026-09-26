@@ -42,8 +42,7 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
                 Bulb bulb = hover.GetHovered(hand);
                 if (bulb != null)
                 {
-                    trial.OnSphereSelected(bulb.id);
-                    SelectedThisFrame = true;
+                    Send(bulb);
                     sent = true;
                 }
             }
@@ -52,11 +51,7 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
             if (pokeEnabled && !sent && hover.PokedThisFrame(hand))
             {
                 Bulb bulb = hover.GetPoked(hand);
-                if (bulb != null)
-                {
-                    trial.OnSphereSelected(bulb.id);
-                    SelectedThisFrame = true;
-                }
+                if (bulb != null) Send(bulb);
             }
         }
 
@@ -64,12 +59,15 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             Bulb bulb = hover.MouseHovered;
-            if (bulb != null)
-            {
-                trial.OnSphereSelected(bulb.id);
-                SelectedThisFrame = true;
-            }
+            if (bulb != null) Send(bulb);
         }
 #endif
+    }
+
+    // One place every selection goes through. Sound comes from hover (soft) and TrialManager (ding on correct).
+    void Send(Bulb bulb)
+    {
+        trial.OnSphereSelected(bulb.id);
+        SelectedThisFrame = true;
     }
 }

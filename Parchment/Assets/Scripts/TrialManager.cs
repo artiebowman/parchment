@@ -60,6 +60,8 @@ public class TrialManager : MonoBehaviour
             return;
         }
 
+        if (AudioFeedback.Instance != null) AudioFeedback.Instance.PlayDing();   // correct sphere
+
         if (!running)
         {
             running = true;

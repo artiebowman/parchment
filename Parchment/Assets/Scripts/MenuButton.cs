@@ -63,6 +63,7 @@ public class MenuButton : MonoBehaviour
                     heldBy = hand;
                     pressedAt = Time.time;
                     flashUntil = Time.time + flashSeconds;
+                    if (AudioFeedback.Instance != null) AudioFeedback.Instance.PlayBlip();
                     onPress.Invoke();
                     break;
                 }

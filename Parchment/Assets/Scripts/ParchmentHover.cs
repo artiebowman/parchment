@@ -122,6 +122,8 @@ public class ParchmentHover : MonoBehaviour
             HandPointer hand = hands[i];
             GameObject reticle = i < reticles.Length ? reticles[i] : null;
 
+            Bulb wasHovered = hovered[i];   // last frame, for the hover sound
+
             hovered[i] = null;
             onSheet[i] = false;
             pokedThisFrame[i] = false;
@@ -195,6 +197,10 @@ public class ParchmentHover : MonoBehaviour
                 pressing[i] = null;
                 lastHeight[i] = float.NegativeInfinity;
             }
+
+            // Soft click whenever this hand lands on a different bulb.
+            if (hovered[i] != null && hovered[i] != wasHovered && AudioFeedback.Instance != null)
+                AudioFeedback.Instance.PlayClick();
 
             if (hovered[i] != null) current.Add(hovered[i]);
 
