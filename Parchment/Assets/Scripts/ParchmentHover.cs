@@ -14,6 +14,7 @@ public class ParchmentHover : MonoBehaviour
     public float snapRadius = 0.03f;
     public float bulbRadius = 0.015f;   // half the Bulb prefab's scale
     public float pressRadius = 0.02f;   // fingertip within this distance of a bulb center = pressing that bulb (a bit bigger than the glass)
+    public float releaseRadius = 0.03f; // once pressing, the tip must get this far from the center to release (hysteresis; keep it below the bulb spacing)
     public float sheetHalfSize = 0.25f; // half the Slab's width; hits outside this are ignored
     public float lineGap = 0.02f;       // beam stops this far short of the coin
     public float nearDistance = 0.15f;  // fingertip within this height above the sheet = near mode (ray off)
@@ -150,8 +151,19 @@ public class ParchmentHover : MonoBehaviour
                         hand.LineClip = 0f;                 // no beam in near mode
                     }
 
-                    // Press: which bulb's ball is the tip inside right now? Only meaningful in near mode.
-                    Bulb inside = near ? NearestBulb(hand.IndexTip, pressRadius) : null;
+                    // Press, with hysteresis. Only meaningful in near mode.
+                    Bulb inside = null;
+                    if (near)
+                    {
+                        // Still holding the bulb from last frame? Keep it until the tip clears releaseRadius.
+                        if (pressing[i] != null &&
+                            Vector3.Distance(pressing[i].transform.position, hand.IndexTip) < releaseRadius)
+                            inside = pressing[i];
+
+                        // Entering a different bulb's ball always wins (drag-through).
+                        Bulb entered = NearestBulb(hand.IndexTip, pressRadius);
+                        if (entered != null && entered != inside) inside = entered;
+                    }
 
                     // Entering a bulb we weren't inside last frame is a poke, unless we came up from under the sheet.
                     bool cameFromBelow = lastHeight[i] < -belowTolerance;
