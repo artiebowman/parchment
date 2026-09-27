@@ -19,6 +19,7 @@ public class MenuButton : MonoBehaviour
     public float flashSeconds = 0.15f;
     public UnityEvent onPress;                // wire the action here in the inspector
     public MonoBehaviour stateSource;         // optional: drag a component that implements IToggleState
+    public Renderer tintTarget;               // optional: what gets colored. Empty = this object's own renderer (the tile). Later: the Icon child.
 
     [System.NonSerialized] public HandPointer[] hands = new HandPointer[0];   // set by PalmMenu each frame
 
@@ -30,16 +31,24 @@ public class MenuButton : MonoBehaviour
 
     void Awake()
     {
-        rend = GetComponent<Renderer>();
+        rend = tintTarget != null ? tintTarget : GetComponent<Renderer>();
         state = stateSource as IToggleState;
         if (stateSource != null && state == null)
             Debug.LogWarning($"MenuButton {name}: stateSource does not implement IToggleState");
-        if (rend != null) rend.material.color = RestColor();
+        Tint(RestColor());
     }
 
     void OnDisable()
     {
         heldBy = null;
+    }
+
+    // Treat this button as already pressed by `hand`: it won't fire until that tip has backed off
+    // past releaseRadius and rearmSeconds have passed. Used when a page appears under a fingertip.
+    public void HoldUntilClear(HandPointer hand)
+    {
+        heldBy = hand;
+        pressedAt = Time.time;
     }
 
     void Update()
@@ -70,8 +79,7 @@ public class MenuButton : MonoBehaviour
             }
         }
 
-        if (rend != null)
-            rend.material.color = Time.time < flashUntil ? pressedColor : RestColor();
+        Tint(Time.time < flashUntil ? pressedColor : RestColor());
     }
 
     // What the button looks like when not being pressed.
@@ -79,5 +87,14 @@ public class MenuButton : MonoBehaviour
     {
         if (state == null) return idleColor;
         return state.IsOn ? onColor : offColor;
+    }
+
+    // Color whatever we're tinting. A SpriteRenderer (the future Icon) tints through .color;
+    // a mesh (today's tile) tints through its material.
+    void Tint(Color c)
+    {
+        if (rend == null) return;
+        if (rend is SpriteRenderer sprite) sprite.color = c;
+        else rend.material.color = c;
     }
 }
