@@ -64,3 +64,16 @@ Self-test for any new idea: would it behave differently with the highlight turne
 - Heat-seeking drones, lock-on-match, pierce-until-red: logic reads the target.
 - Bigger collider on the lit bulb: target easier to select than non-targets.
 - Body-locked or head-locked parchment: drift and sickness; world-locked is simpler and we don't move during a run.
+
+## Phantom (extension of Parchment)
+- Absolute mapping: phantom = sheet center + gain × (fingertip − sheet center), in-plane axes only.
+  Depth axis stays 1:1 so poke works through the phantom finger. Clamped to sheet bounds.
+- Gain default 2.0. Settings: 1.0–10.0, coarse ±0.5 and fine ±0.1 nudge buttons (slider post-showcase).
+- Ghost hand = real hand mesh baked per frame, translated so index tip sits at the gained point.
+  Reticle stays under the phantom fingertip. Fallback if the hand renderer fights: flat hand outline.
+- Real hand dimmed with a ghostly violet glow while Phantom is active (via HandTint).
+- Both hands, symmetric.
+- IsOn = wanted. Effective only while Parchment is unrolled (ParchmentMode.Ready); button stays green
+  when rolled up, phantom hidden, comes back on unroll.
+- Per-trial log: search (target appears → hover start) and move (hover start → confirm).
+- Grenade: dropped. README future work only.
