@@ -27,6 +27,10 @@ public class SyncSweep : MonoBehaviour
     [Range(0f, 1f)] public float chimeVolume = 0.3f;   // the "synced" chime: two rising notes, distinct from the selection ding
     public float chimeDelay = 0.35f;   // beat of silence between the last tick and the chime
 
+    [Header("Glow")]
+    public Color glowColor = Color.white;   // every bulb flares to this on the chime
+    public float glowSeconds = 0.6f;        // and eases back to its own color over this long
+
     private class Entry
     {
         public Bulb bulb;
@@ -49,6 +53,8 @@ public class SyncSweep : MonoBehaviour
     private int tickIndex;
     private bool sawAny;
     private bool done;
+    private bool glowing;
+    private float glowStart;
 
     void Start()
     {
@@ -87,6 +93,7 @@ public class SyncSweep : MonoBehaviour
         tickIndex = 0;
         sawAny = false;
         done = false;
+        glowing = false;
     }
 
     // A bulb just popped in: paint it red and queue its read.
@@ -107,6 +114,7 @@ public class SyncSweep : MonoBehaviour
 
     void Update()
     {
+        if (glowing) UpdateGlow();
         if (done) return;
 
         // Rolled up mid-sweep: stop quietly.
@@ -159,9 +167,27 @@ public class SyncSweep : MonoBehaviour
 
     void PlayChime()
     {
+        glowing = true;                       // the flare lands with the sound
+        glowStart = Time.time;
         if (tickSource == null || chime == null) return;
         tickSource.pitch = 1f;
         tickSource.PlayOneShot(chime, chimeVolume);
+    }
+
+    // Chime flare: every bulb goes to glowColor at once, then eases back to its own color. Purely visual.
+    void UpdateGlow()
+    {
+        if (scanner == null || scanner.bulbParent == null) { glowing = false; return; }
+        float k = Mathf.Clamp01((Time.time - glowStart) / Mathf.Max(glowSeconds, 0.01f));
+        float ease = 1f - (1f - k) * (1f - k);   // fast out, slow settle
+        foreach (Transform t in scanner.bulbParent)
+        {
+            Bulb b = t.GetComponent<Bulb>();
+            if (b == null) continue;
+            if (k >= 1f) b.ClearOverride();
+            else b.SetOverride(Color.Lerp(glowColor, b.idleColor, ease));
+        }
+        if (k >= 1f) glowing = false;
     }
 
     // One tick per column: fires when the read moves to a new X on the sheet, pitch rising left to right.

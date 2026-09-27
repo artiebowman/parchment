@@ -84,7 +84,7 @@ public class CubeRaySelector : MonoBehaviour
 
             if (trial.RunFinished)
             {
-                if (wasFinishedLastFrame) trial.StartNextRun();   // ignore the pinch that finished the run
+                if (wasFinishedLastFrame && (trial.HasStarted || hand.DoublePinchedThisFrame)) trial.StartNextRun();   // double pinch for run 1, single pinch after; the pinch that finished a run never counts
                 return;
             }
 

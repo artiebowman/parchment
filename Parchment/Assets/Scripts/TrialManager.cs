@@ -14,6 +14,7 @@ public class TrialManager : MonoBehaviour
     public Scoreboard board;
     public int totalRuns = 7;
     public bool RunFinished { get; private set; }
+    public bool HasStarted => hasStarted;   // false until run 1 begins; CubeRaySelector asks for a double pinch until then
 
     void Start()
     {
@@ -21,7 +22,7 @@ public class TrialManager : MonoBehaviour
 
         // Wait for a pinch before run 1, same as between runs. Nothing is highlighted yet.
         RunFinished = true;
-        board.ShowPrompt("Pinch to start");
+        board.ShowPrompt("Double pinch to start");
     }
 
     public void StartRun(int run)

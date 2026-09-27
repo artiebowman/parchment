@@ -14,6 +14,7 @@ public class HandPointer : MonoBehaviour
     [System.NonSerialized] public Ray PointerRay;
     public bool ConfirmedThisFrame;
     [System.NonSerialized] public float PinchStrength;   // index-thumb pinch, 0..1, this frame
+    [System.NonSerialized] public bool DoublePinchedThisFrame;   // two confirms within doublePinchWindow; set on the second one
     public bool IsTracked;
 
     // Beam starts at the index fingertip (direction still comes from Meta's stabilized pointer pose).
@@ -42,10 +43,12 @@ public class HandPointer : MonoBehaviour
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
     [Range(0f, 1f)] public float pinchOffThreshold = 0.5f;
     public float cooldownSeconds = 0.15f;
+    public float doublePinchWindow = 0.45f;   // second pinch must land within this of the first to count as a double
     public bool requireHighConfidence = true;   // ignore pinches from a poorly tracked hand
 
     private bool isPinching;
     private float nextAllowedTime;
+    private float lastConfirmTime = float.NegativeInfinity;
 
     public Material rayMaterial;
     public float rayLength = 2f;
@@ -72,6 +75,7 @@ public class HandPointer : MonoBehaviour
     void Update()
     {
         ConfirmedThisFrame = false;
+        DoublePinchedThisFrame = false;
         LineClip = float.PositiveInfinity;
         Resting = false;
         IsTracked = hand.IsTracked;
@@ -158,6 +162,8 @@ public class HandPointer : MonoBehaviour
                 {
                     ConfirmedThisFrame = true;
                     nextAllowedTime = Time.time + cooldownSeconds;
+                    if (Time.time - lastConfirmTime <= doublePinchWindow) { DoublePinchedThisFrame = true; lastConfirmTime = float.NegativeInfinity; }
+                    else lastConfirmTime = Time.time;
                 }
             }
         }
