@@ -9,6 +9,7 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
     public HandPointer[] hands;     // drag both hand objects here
     public ParchmentHover hover;    // drag TaskCube here
     public TrialManager trial;      // drag TaskCube here
+    public PhantomMode phantom;     // drag TaskCube here; while Phantom is live, poke is forced on and pinch is ignored
     public bool pokeEnabled = true; // fingertip entering a bulb selects it; pinch always works regardless
 
     // True for the frame in which this selector sent a selection. CubeRaySelector yields that frame.
@@ -29,6 +30,7 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
 
         if (hover == null || trial == null) return;
         if (trial.RunFinished) return;              // CubeRaySelector handles "pinch to continue"
+        bool phantomLive = phantom != null && phantom.Active;
 
         foreach (HandPointer hand in hands)
         {
@@ -37,7 +39,7 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
             bool sent = false;
 
             // Pinch: selects whatever this hand is hovering.
-            if (hand.ConfirmedThisFrame)
+            if (hand.ConfirmedThisFrame && !phantomLive)
             {
                 Bulb bulb = hover.GetHovered(hand);
                 if (bulb != null)
@@ -48,7 +50,7 @@ public class ParchmentSelector : MonoBehaviour, IToggleState
             }
 
             // Poke: selects the bulb the fingertip just entered. Skipped if the pinch already sent one this frame.
-            if (pokeEnabled && !sent && hover.PokedThisFrame(hand))
+            if ((pokeEnabled || phantomLive) && !sent && hover.PokedThisFrame(hand))
             {
                 Bulb bulb = hover.GetPoked(hand);
                 if (bulb != null) Send(bulb);
