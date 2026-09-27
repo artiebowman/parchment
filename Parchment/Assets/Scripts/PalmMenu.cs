@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-40)]   // after ParchmentHover (-50), before ParchmentSelector (-10) and CubeRaySelector (0): Resting set here is the last word
 public class PalmMenu : MonoBehaviour
 {
     public HandPointer menuHand;    // drag the LEFT hand here
