@@ -13,6 +13,7 @@ public class HandPointer : MonoBehaviour
 
     [System.NonSerialized] public Ray PointerRay;
     public bool ConfirmedThisFrame;
+    [System.NonSerialized] public float PinchStrength;   // index-thumb pinch, 0..1, this frame
     public bool IsTracked;
 
     // Beam starts at the index fingertip (direction still comes from Meta's stabilized pointer pose).
@@ -77,6 +78,7 @@ public class HandPointer : MonoBehaviour
         HasIndexTip = false;
         HasPalm = false;
         PalmUp = false;
+        PinchStrength = 0f;
 
         if (!IsTracked)
         {
@@ -144,6 +146,7 @@ public class HandPointer : MonoBehaviour
                          || hand.HandConfidence == OVRHand.TrackingConfidence.High;
 
         float strength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
+        PinchStrength = strength;
         bool suppressed = Time.time < SuppressConfirmUntil;   // menu is up (or just closed): pinches are not confirms
 
         if (!isPinching)

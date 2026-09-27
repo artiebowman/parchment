@@ -2202,6 +2202,7 @@ MonoBehaviour:
   handRenderer: {fileID: 824298939}
   idleColor: {r: 1, g: 1, b: 1, a: 0.9019608}
   palmUpColor: {r: 0.2509804, g: 0.5019608, b: 1, a: 0.9019608}
+  phantomColor: {r: 0.55, g: 0.35, b: 0.95, a: 1}
   blendSpeed: 12
 --- !u!1 &832575517
 GameObject:
@@ -3192,6 +3193,66 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037796930}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1038631795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1038631796}
+  - component: {fileID: 1038631797}
+  m_Layer: 0
+  m_Name: Trackpad
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1038631796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038631795}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2051825407}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1038631797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038631795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 792d85cc32fb849e3b96001bf2d2fab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PhantomPad
+  parchment: {fileID: 2020093375}
+  phantom: {fileID: 2051825422}
+  scanner: {fileID: 2051825413}
+  lineMaterial: {fileID: 2100000, guid: 9a31d73940aa444469016855ec44a52b, type: 2}
+  offset: {x: 0, y: 0.12, z: 0}
+  padWidth: 0.09
+  padThickness: 0.01
+  activeHeight: 0.15
+  columns: 10
+  reticleSize: 0.006
+  reticleColor: {r: 1, g: 1, b: 1, a: 1}
+  markerSize: 0.008
+  targetColor: {r: 0.2, g: 0.9019608, b: 0.3019608, a: 1}
+  hoverColor: {r: 0.6, g: 0.45, b: 0.9, a: 0}
+  lineWidth: 0.002
+  lineColor: {r: 1, g: 0.85, b: 0.2, a: 1}
 --- !u!1 &1061790498
 GameObject:
   m_ObjectHideFlags: 0
@@ -3807,6 +3868,7 @@ MonoBehaviour:
   handRenderer: {fileID: 1113013143}
   idleColor: {r: 1, g: 1, b: 1, a: 0.9019608}
   palmUpColor: {r: 0.2509804, g: 0.5019608, b: 1, a: 0.9019608}
+  phantomColor: {r: 0.55, g: 0.35, b: 0.95, a: 1}
   blendSpeed: 12
 --- !u!1 &1137256573
 GameObject:
@@ -4840,8 +4902,8 @@ GameObject:
   - component: {fileID: 2051825419}
   - component: {fileID: 2051825421}
   - component: {fileID: 2051825420}
-  - component: {fileID: 2051825422}
   - component: {fileID: 2051825423}
+  - component: {fileID: 2051825422}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -4864,6 +4926,7 @@ Transform:
   m_Children:
   - {fileID: 1158496575}
   - {fileID: 286203568}
+  - {fileID: 1038631796}
   - {fileID: 2020093375}
   - {fileID: 491045704}
   - {fileID: 559974572}
@@ -4984,9 +5047,11 @@ MonoBehaviour:
   - {fileID: 1189922534}
   parchment: {fileID: 2020093375}
   scanner: {fileID: 2051825413}
+  phantom: {fileID: 2051825422}
   snapRadius: 0.03
   bulbRadius: 0.015
   pressRadius: 0.02
+  phantomPressRadius: 0.03
   releaseRadius: 0.03
   sheetHalfSize: 0.25
   lineGap: 0.02
@@ -5433,7 +5498,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a76c971624bb424da2044fa7d817b07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhantomMode
+  mode: {fileID: 2051825416}
+  parchment: {fileID: 2020093375}
+  pad: {fileID: 1038631797}
+  boardHalf: 0.225
+  ghostMaterial: {fileID: 2100000, guid: b3a202b4763dd4edebbd22e9e92cafa2, type: 2}
+  hands:
+  - hand: {fileID: 1113013150}
+    tint: {fileID: 1113013151}
+    handMesh: {fileID: 1113013143}
+  - hand: {fileID: 824298946}
+    tint: {fileID: 824298947}
+    handMesh: {fileID: 824298939}
   wanted: 0
+  ghostScale: 0.4
+  ghostLift: 0.005
 --- !u!114 &2051825423
 MonoBehaviour:
   m_ObjectHideFlags: 0

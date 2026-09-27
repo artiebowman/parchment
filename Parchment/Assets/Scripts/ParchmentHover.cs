@@ -11,9 +11,11 @@ public class ParchmentHover : MonoBehaviour
     public GameObject[] reticles;       // drag Reticle_L then Reticle_R here (same order as hands)
     public Transform parchment;         // drag Parchment here
     public ParchmentScanner scanner;    // drag TaskCube here
+    public PhantomMode phantom;         // drag TaskCube here (its PhantomMode); empty = no Phantom
     public float snapRadius = 0.03f;
     public float bulbRadius = 0.015f;   // half the Bulb prefab's scale
     public float pressRadius = 0.02f;   // fingertip within this distance of a bulb center = pressing that bulb (a bit bigger than the glass)
+    public float phantomPressRadius = 0.03f; // Phantom only: covers a whole 0.045 cell corner to corner, so the phantom is always in exactly one bulb
     public float releaseRadius = 0.03f; // once pressing, the tip must get this far from the center to release (hysteresis; keep it below the bulb spacing)
     public float sheetHalfSize = 0.25f; // half the Slab's width; hits outside this are ignored
     public float lineGap = 0.02f;       // beam stops this far short of the coin
@@ -137,51 +139,89 @@ public class ParchmentHover : MonoBehaviour
                 hand.Resting = !sheet.GetSide(hand.PointerRay.origin);   // hand below the sheet = at rest
 
                 bool near = false;
+                bool ghost = false;   // Phantom is driving this hand this frame
 
-                if (hand.HasIndexTip)
+                // Phantom: fingertip on the trackpad maps corner-for-corner onto the bulb plane.
+                // Sliding that point through a bulb pokes it.
+                if (phantom != null && phantom.Active && phantom.pad != null && hand.HasIndexTip)
                 {
-                    float height = sheet.GetDistanceToPoint(hand.IndexTip);   // + above, - below
-                    Vector3 projected = sheet.ClosestPointOnPlane(hand.IndexTip);
-
-                    // Near mode: fingertip projected straight down onto the sheet, height ignored.
-                    if (height <= nearDistance && height >= -belowTolerance && InsideSheet(projected))
+                    if (phantom.pad.TryMap(hand.IndexTip, out Vector2 uv))
                     {
+                        Vector3 tip = sheet.ClosestPointOnPlane(phantom.OnBoard(uv));   // always on the bulb plane
+                        ghost = true;
                         near = true;
                         hit = true;
-                        point = projected;
-                        hovered[i] = NearestBulb(projected, snapRadius);
-                        hand.LineClip = 0f;                 // no beam in near mode
-                    }
+                        point = tip;
+                        hovered[i] = NearestBulb(tip, snapRadius);
+                        hand.LineClip = 0f;
+                        phantom.pad.ShowReticle(i, hand.IndexTip);
 
-                    // Press, with hysteresis. Only meaningful in near mode.
-                    Bulb inside = null;
-                    if (near)
-                    {
-                        // Still holding the bulb from last frame? Keep it until the tip clears releaseRadius.
-                        if (pressing[i] != null &&
-                            Vector3.Distance(pressing[i].transform.position, hand.IndexTip) < releaseRadius)
+                        // Press with the same hysteresis as a real poke; entering a bulb is the confirm.
+                        Bulb inside = null;
+                        if (pressing[i] != null && Vector3.Distance(pressing[i].transform.position, tip) < releaseRadius)
                             inside = pressing[i];
-
-                        // Entering a different bulb's ball always wins (drag-through).
-                        Bulb entered = NearestBulb(hand.IndexTip, pressRadius);
+                        Bulb entered = NearestBulb(tip, phantomPressRadius);
                         if (entered != null && entered != inside) inside = entered;
-                    }
 
-                    // Entering a bulb we weren't inside last frame is a poke, unless we came up from under the sheet.
-                    bool cameFromBelow = lastHeight[i] < -belowTolerance;
-                    if (inside != null && inside != pressing[i] && !cameFromBelow)
-                    {
-                        pokedThisFrame[i] = true;
-                        pokedBulb[i] = inside;
+                        if (inside != null && inside != pressing[i])
+                        {
+                            pokedThisFrame[i] = true;
+                            pokedBulb[i] = inside;
+                        }
+                        pressing[i] = inside;
+                        lastHeight[i] = 0f;
+                        phantom.Report(hand, true, tip);
                     }
-
-                    pressing[i] = inside;
-                    lastHeight[i] = height;
+                    else phantom.Report(hand, false, Vector3.zero);
                 }
-                else
+
+                if (!ghost)
                 {
-                    pressing[i] = null;
-                    lastHeight[i] = float.NegativeInfinity;   // lost the tip; whatever it reappears inside doesn't count
+                    if (hand.HasIndexTip)
+                    {
+                        float height = sheet.GetDistanceToPoint(hand.IndexTip);   // + above, - below
+                        Vector3 projected = sheet.ClosestPointOnPlane(hand.IndexTip);
+
+                        // Near mode: fingertip projected straight down onto the sheet, height ignored.
+                        if (height <= nearDistance && height >= -belowTolerance && InsideSheet(projected))
+                        {
+                            near = true;
+                            hit = true;
+                            point = projected;
+                            hovered[i] = NearestBulb(projected, snapRadius);
+                            hand.LineClip = 0f;                 // no beam in near mode
+                        }
+
+                        // Press, with hysteresis. Only meaningful in near mode.
+                        Bulb inside = null;
+                        if (near)
+                        {
+                            // Still holding the bulb from last frame? Keep it until the tip clears releaseRadius.
+                            if (pressing[i] != null &&
+                                Vector3.Distance(pressing[i].transform.position, hand.IndexTip) < releaseRadius)
+                                inside = pressing[i];
+
+                            // Entering a different bulb's ball always wins (drag-through).
+                            Bulb entered = NearestBulb(hand.IndexTip, pressRadius);
+                            if (entered != null && entered != inside) inside = entered;
+                        }
+
+                        // Entering a bulb we weren't inside last frame is a poke, unless we came up from under the sheet.
+                        bool cameFromBelow = lastHeight[i] < -belowTolerance;
+                        if (inside != null && inside != pressing[i] && !cameFromBelow)
+                        {
+                            pokedThisFrame[i] = true;
+                            pokedBulb[i] = inside;
+                        }
+
+                        pressing[i] = inside;
+                        lastHeight[i] = height;
+                    }
+                    else
+                    {
+                        pressing[i] = null;
+                        lastHeight[i] = float.NegativeInfinity;   // lost the tip; whatever it reappears inside doesn't count
+                    }
                 }
 
                 if (!near)
