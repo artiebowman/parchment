@@ -4841,6 +4841,7 @@ GameObject:
   - component: {fileID: 2051825421}
   - component: {fileID: 2051825420}
   - component: {fileID: 2051825422}
+  - component: {fileID: 2051825423}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -5238,6 +5239,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  bulbsRide: 0
   startUnrolled: 0
 --- !u!114 &2051825417
 MonoBehaviour:
@@ -5432,6 +5434,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhantomMode
   wanted: 0
+--- !u!114 &2051825423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051825406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e7b0667f2604ff9be9e247e12460f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SyncSweep
+  mode: {fileID: 2051825416}
+  scanner: {fileID: 2051825413}
+  haloMaterial: {fileID: 2100000, guid: 26f076bc3130445f9936bfc069c6c530, type: 2}
+  sweepSeconds: 2
+  readLag: 0.3
+  flashSeconds: 0.25
+  unsyncedColor: {r: 0.9, g: 0.25, b: 0.2, a: 1}
+  syncColor: {r: 0.2, g: 0.9, b: 0.3, a: 1}
+  haloScale: 1.7
+  tickVolume: 0.08
+  tickPitchLow: 0.8
+  tickPitchHigh: 1.6
+  chimeVolume: 0.3
+  chimeDelay: 0.35
 --- !u!1 &2069883850
 GameObject:
   m_ObjectHideFlags: 0

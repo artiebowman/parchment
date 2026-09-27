@@ -34,6 +34,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
     public float bulbsInSeconds = 0.65f; // stagger across the whole grid
     public float popSeconds = 0.08f;     // each bulb's own grow-in
     public AnimationCurve popCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.6f, 1.12f), new Keyframe(1f, 1f));   // slight overshoot
+    public bool bulbsRide = false;      // set by SyncSweep once synced: bulbs are part of the sheet, revealed by the opening edge, no stagger
 
     public bool startUnrolled = true;
 
@@ -69,6 +70,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
         public Vector3 fullScale;
         public bool shown;
         public float key;               // sort value for the arrival order
+        public float x;                 // position across the sheet, in Sheet space (for reveal-by-width)
     }
     private readonly List<BulbView> bulbs = new List<BulbView>();
 
@@ -137,24 +139,31 @@ public class ParchmentMode : MonoBehaviour, IToggleState
         anim = StartCoroutine(value ? Unroll() : RollUp());
     }
 
-    // Sheet opens; bulbs start arriving once progress passes bulbsStartAt, while the sheet is still settling.
+    // Sheet opens. Before the sync, bulbs pop in staggered once progress passes bulbsStartAt; after it, they ride the sheet.
     IEnumerator Unroll()
     {
         GatherBulbs(true);
         foreach (BulbView b in bulbs) SetShown(b, false);
-        sheetAnim = StartCoroutine(MoveSheet(1f, unrollSeconds));
-        while (sheetMoving && progress < bulbsStartAt) yield return null;
-        yield return BulbsIn();
-        while (sheetMoving) yield return null;
+        if (bulbsRide)
+        {
+            yield return MoveSheet(1f, unrollSeconds);        // RevealByWidth shows them as the edge passes
+        }
+        else
+        {
+            sheetAnim = StartCoroutine(MoveSheet(1f, unrollSeconds));
+            while (sheetMoving && progress < bulbsStartAt) yield return null;
+            yield return BulbsIn();
+            while (sheetMoving) yield return null;
+        }
         anim = null;
         Finish(true);
     }
 
-    // Bulbs leave first, then the sheet closes.
+    // Bulbs leave first (pre-sync), then the sheet closes; after the sync the closing edge hides them.
     IEnumerator RollUp()
     {
         GatherBulbs(true);
-        yield return BulbsOut();
+        if (!bulbsRide) yield return BulbsOut();
         yield return MoveSheet(0f, rollUpSeconds);
         anim = null;
         Finish(false);
@@ -212,6 +221,21 @@ public class ParchmentMode : MonoBehaviour, IToggleState
         sheet.localRotation = Quaternion.Euler(pitchCurve.Evaluate(progress), 0f, 0f);
         sheet.localPosition = new Vector3(0f, riseCurve.Evaluate(progress), approachCurve.Evaluate(progress));
         ApplySlabAlpha(alphaCurve.Evaluate(progress));
+        if (bulbsRide) RevealByWidth(width);
+    }
+
+    // After the sync, bulbs are printed on the sheet: visible exactly when the open part of the slab covers them.
+    void RevealByWidth(float width)
+    {
+        float half = slabFullScale.x * 0.5f * width;
+        float shrink = Mathf.Clamp01(alphaCurve.Evaluate(progress));   // bulbs are opaque, so they fade with the sheet by shrinking
+        foreach (BulbView b in bulbs)
+        {
+            if (b.t == null) continue;
+            bool vis = Mathf.Abs(b.x) <= half + 0.001f;
+            if (vis != b.shown) SetShown(b, vis);
+            if (vis) b.t.localScale = b.fullScale * shrink;
+        }
     }
 
     // Alpha goes through a property block so the shared material is never edited.
@@ -298,6 +322,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
                 b.shown = true;
                 if (!newAreShown) SetShown(b, false);
             }
+            b.x = sheet.InverseTransformPoint(child.position).x;
             b.key = OrderKey(child, i);
             bulbs.Add(b);
             i++;

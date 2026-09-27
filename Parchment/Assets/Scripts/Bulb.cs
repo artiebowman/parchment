@@ -15,6 +15,8 @@ public class Bulb : MonoBehaviour
     public bool IsHovered => state == State.Hover || state == State.HoverTarget;
 
     private Renderer rend;
+    private bool hasOverride;         // an override color wins over the state color until cleared (used by the sync sweep)
+    private Color overrideColor;
 
     void Awake()
     {
@@ -29,9 +31,30 @@ public class Bulb : MonoBehaviour
         Apply();
     }
 
+    // Paint this bulb a color regardless of state. State changes still happen underneath and show again on ClearOverride.
+    public void SetOverride(Color c)
+    {
+        hasOverride = true;
+        overrideColor = c;
+        Apply();
+    }
+
+    public void ClearOverride()
+    {
+        if (!hasOverride) return;
+        hasOverride = false;
+        Apply();
+    }
+
     private void Apply()
     {
         if (rend == null) return;
+
+        if (hasOverride)
+        {
+            rend.material.color = overrideColor;
+            return;
+        }
 
         switch (state)
         {
