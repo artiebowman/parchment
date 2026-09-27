@@ -1,27 +1,46 @@
 using UnityEngine;
 
-public class TrialManager : MonoBehaviour
+public class TrialManager : MonoBehaviour, IToggleState
 {
     private SequenceLoader loader;
     private int[] sequence;
     private int currentIndex = 0;
     private float startTime;
     private bool running = false;
-    private bool hasStarted = false;    // false until the first run is kicked off by a pinch
+    private bool hasStarted = false;    // false until run 1 is kicked off by a double pinch
+    private bool practicing = false;    // the run in progress (or just finished) was a practice run
     private Renderer currentTarget;
     private Color originalColor;
 
     public Scoreboard board;
+    public RunLog log;                  // optional: the run-by-run list beside the cube
     public int totalRuns = 7;
+    public bool practice = true;        // on by default. Runs started while on are unscored and don't advance the counter; off = live
     public bool RunFinished { get; private set; }
     public bool HasStarted => hasStarted;   // false until run 1 begins; CubeRaySelector asks for a double pinch until then
+
+    // IToggleState for the Practice button.
+    public bool IsOn => practice;
+    public void TogglePractice() { practice = !practice; }
 
     void Start()
     {
         loader = GetComponent<SequenceLoader>();
+        ResetSession();
+    }
 
-        // Wait for a pinch before run 1, same as between runs. Nothing is highlighted yet.
+    // Back to the very beginning: run 1 on deck, nothing highlighted, waiting for the double pinch.
+    public void ResetSession()
+    {
+        ClearHighlight();
+        sequence = null;
+        currentIndex = 0;
+        running = false;
+        hasStarted = false;
+        practicing = false;
         RunFinished = true;
+        if (loader != null) loader.runNumber = 1;
+        if (log != null) log.Clear();
         board.ShowPrompt("Double pinch to start");
     }
 
@@ -38,16 +57,18 @@ public class TrialManager : MonoBehaviour
         currentIndex = 0;
         running = false;
         hasStarted = true;
+        practicing = practice;
         RunFinished = false;
         HighlightTarget();
-        board.ShowProgress(run, 1, sequence.Length);
-        Debug.Log("TrialManager: run " + run + " started, first target Sphere_" + sequence[0]);
+        board.ShowProgress(run, 1, sequence.Length, practicing);
+        Debug.Log("TrialManager: run " + run + (practicing ? " (practice)" : "") + " started, first target Sphere_" + sequence[0]);
     }
 
+    // The run on deck: the same number again after a practice run (or before run 1), the next one after a real run.
     public void StartNextRun()
     {
-        if (!hasStarted) StartRun(loader.runNumber);   // first pinch starts whatever run the slider is on
-        else StartRun(loader.runNumber + 1);
+        int run = (!hasStarted || practicing) ? loader.runNumber : loader.runNumber + 1;
+        StartRun(run);
     }
 
     public void OnSphereSelected(int id)
@@ -78,12 +99,13 @@ public class TrialManager : MonoBehaviour
             float elapsed = Time.time - startTime;
             running = false;
             RunFinished = true;
-            board.ShowRunTime(loader.runNumber, elapsed);
-            Debug.Log("TrialManager: run " + loader.runNumber + " complete in " + elapsed.ToString("F2") + " s");
+            board.ShowRunTime(loader.runNumber, elapsed, practicing);
+            if (log != null) log.Add(loader.runNumber, elapsed, practicing);
+            Debug.Log("TrialManager: run " + loader.runNumber + (practicing ? " (practice)" : "") + " complete in " + elapsed.ToString("F2") + " s");
         }
         else
         {
-            board.ShowProgress(loader.runNumber, currentIndex + 1, sequence.Length);
+            board.ShowProgress(loader.runNumber, currentIndex + 1, sequence.Length, practicing);
         }
     }
 
@@ -94,14 +116,16 @@ public class TrialManager : MonoBehaviour
         return id == sequence[currentIndex];
     }
 
+    private void ClearHighlight()
+    {
+        if (currentTarget != null) currentTarget.material.color = originalColor;
+        currentTarget = null;
+    }
+
     private void HighlightTarget()
     {
-        if (currentTarget != null)
-        {
-            currentTarget.material.color = originalColor;
-        }
-
-        if (currentIndex >= sequence.Length) return;
+        ClearHighlight();
+        if (sequence == null || currentIndex >= sequence.Length) return;
 
         Transform sphere = transform.Find("Sphere_" + sequence[currentIndex]);
         currentTarget = sphere.GetComponent<Renderer>();

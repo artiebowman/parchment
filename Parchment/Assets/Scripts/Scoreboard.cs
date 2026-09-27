@@ -5,18 +5,20 @@ public class Scoreboard : MonoBehaviour
 {
     public TMP_Text text;
 
-    public void ShowProgress(int run, int targetIndex, int total)
+    public void ShowProgress(int run, int targetIndex, int total, bool practice = false)
     {
-        text.text = "Run " + run + "\nTarget " + targetIndex + " of " + total;
+        text.text = Label(run, practice) + "\nTarget " + targetIndex + " of " + total;
     }
 
-    public void ShowRunTime(int run, float seconds)
+    public void ShowRunTime(int run, float seconds, bool practice = false)
     {
-        text.text = "Run " + run + " complete\n" + seconds.ToString("F2") + " s\nPinch to continue";
+        text.text = Label(run, practice) + " complete\n" + seconds.ToString("F2") + " s\nPinch to continue";
     }
 
     public void ShowPrompt(string message)
     {
         text.text = message;
     }
+
+    static string Label(int run, bool practice) { return (practice ? "Practice run " : "Run ") + run; }
 }

@@ -12,6 +12,7 @@ public class ParchmentHover : MonoBehaviour
     public Transform parchment;         // drag Parchment here
     public ParchmentScanner scanner;    // drag TaskCube here
     public PhantomMode phantom;         // drag TaskCube here (its PhantomMode); empty = no Phantom
+    public PalmMenu menu;               // drag TaskCube here (its PalmMenu); while the menu is up, hands are off the sheet
     public float snapRadius = 0.03f;
     public float bulbRadius = 0.015f;   // half the Bulb prefab's scale
     public float pressRadius = 0.02f;   // fingertip within this distance of a bulb center = pressing that bulb (a bit bigger than the glass)
@@ -134,7 +135,8 @@ public class ParchmentHover : MonoBehaviour
             Vector3 point = Vector3.zero;
             float dist = 0f;
 
-            if (hand != null && hand.IsTracked)
+            bool menuUp = menu != null && menu.IsShown;   // menu open: no reticle, hover, poke or phantom on the sheet
+            if (hand != null && hand.IsTracked && !menuUp)
             {
                 hand.Resting = !sheet.GetSide(hand.PointerRay.origin);   // hand below the sheet = at rest
 
