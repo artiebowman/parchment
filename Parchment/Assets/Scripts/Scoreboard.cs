@@ -12,7 +12,7 @@ public class Scoreboard : MonoBehaviour
 
     public void ShowRunTime(int run, float seconds, bool practice = false)
     {
-        text.text = Label(run, practice) + " complete\n" + seconds.ToString("F2") + " s\nPinch to continue";
+        text.text = Label(run, practice) + " Complete\n" + seconds.ToString("F2") + " s\nPinch to Continue";
     }
 
     public void ShowPrompt(string message)
@@ -20,5 +20,5 @@ public class Scoreboard : MonoBehaviour
         text.text = message;
     }
 
-    static string Label(int run, bool practice) { return (practice ? "Practice run " : "Run ") + run; }
+    static string Label(int run, bool practice) { return practice ? "Practice Run" : "Run " + run; }
 }

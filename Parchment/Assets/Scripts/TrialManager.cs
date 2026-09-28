@@ -41,14 +41,14 @@ public class TrialManager : MonoBehaviour, IToggleState
         RunFinished = true;
         if (loader != null) loader.runNumber = 1;
         if (log != null) log.Clear();
-        board.ShowPrompt("Double pinch to start");
+        board.ShowPrompt("Double Pinch to Start");
     }
 
     public void StartRun(int run)
     {
         if (run > totalRuns)
         {
-            board.ShowPrompt("All " + totalRuns + " runs complete");
+            board.ShowPrompt("All " + totalRuns + " Runs Complete");
             return;
         }
 
