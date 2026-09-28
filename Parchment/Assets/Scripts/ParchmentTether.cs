@@ -6,6 +6,7 @@ public class ParchmentTether : MonoBehaviour
     public ParchmentScanner scanner;    // drag TaskCube here
     public Transform parchment;         // drag Parchment here
     public Material lineMaterial;       // drag RayLine here
+    public PhantomMode phantom;         // drag TaskCube here; while Phantom is live the trackpad carries the guide line and this one hides
 
     public Color[] handColors = { new Color(0.3f, 0.65f, 1f), new Color(1f, 0.17f, 0.17f) };   // L blue, R red
     public float width = 0.003f;
@@ -31,6 +32,7 @@ public class ParchmentTether : MonoBehaviour
         line.enabled = false;
 
         if (hover == null || scanner == null || !hover.enabled) return;
+        if (phantom != null && phantom.Active) return;
 
         Bulb target = scanner.TargetBulb;
         if (target == null) return;

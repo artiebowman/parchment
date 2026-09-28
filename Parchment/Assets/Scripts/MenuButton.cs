@@ -13,6 +13,8 @@ public class MenuButton : MonoBehaviour
     public float pressRadius = 0.025f;       // fingertip within this of the button center = pressing
     public float releaseRadius = 0.05f;      // once pressed, the tip must get this far away to re-arm (punch-through stays inside)
     public float rearmSeconds = 0.3f;        // and this long must have passed since the press
+    public float repeatAfter = 0f;           // 0 = no auto-repeat; otherwise keeping the tip in the bubble fires again after this long
+    public float repeatEvery = 0.25f;        // and then every this often until the tip leaves
     public Color idleColor = new Color(0.25f, 0.25f, 0.28f);   // used only when there is no stateSource
     public Color onColor = new Color(0.2f, 0.8f, 0.3f);        // feature on = solid green
     public Color offColor = new Color(0.16f, 0.16f, 0.18f);    // feature off = dim gray
@@ -45,6 +47,7 @@ public class MenuButton : MonoBehaviour
     private HandPointer heldBy;               // the hand that pressed and hasn't re-armed yet (null = armed)
     private float pressedAt = float.NegativeInfinity;
     private float flashUntil;
+    private float nextRepeatAt = float.PositiveInfinity;
     private float holdProgress;               // 0..1, fills while a tip sits in the bubble, drains when it leaves
     private LineRenderer ring;
     private const int RingSegments = 32;
@@ -92,6 +95,16 @@ public class MenuButton : MonoBehaviour
             if (gone) heldBy = null;
         }
 
+        // Auto-repeat: still held in the bubble past repeatAfter, so fire again on a cadence.
+        if (heldBy != null && enabledNow && Time.time >= nextRepeatAt && heldBy.IsTracked && heldBy.HasIndexTip
+            && Vector3.Distance(heldBy.IndexTip, transform.position) <= pressRadius)
+        {
+            nextRepeatAt = Time.time + repeatEvery;
+            flashUntil = Time.time + flashSeconds;
+            if (AudioFeedback.Instance != null) AudioFeedback.Instance.PlayBlip();
+            onPress.Invoke();
+        }
+
         // Which hand, if any, has its tip in the bubble while the button is armed and enabled.
         HandPointer inBubble = null;
         if (enabledNow && heldBy == null)
@@ -131,6 +144,7 @@ public class MenuButton : MonoBehaviour
     {
         heldBy = hand;
         pressedAt = Time.time;
+        nextRepeatAt = repeatAfter > 0f ? Time.time + repeatAfter : float.PositiveInfinity;
         flashUntil = Time.time + flashSeconds;
         if (AudioFeedback.Instance != null) AudioFeedback.Instance.PlayBlip();
         onPress.Invoke();

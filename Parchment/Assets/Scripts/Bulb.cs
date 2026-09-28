@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Bulb : MonoBehaviour
@@ -12,7 +13,21 @@ public class Bulb : MonoBehaviour
     public Color hoverColor = new Color(1f, 0.85f, 0.2f);
     public Color hoverTargetColor = new Color(0.5f, 1f, 0.5f);
 
+    [Header("Phantom look")]
+    public Color phantomIdleColor = new Color(0.3f, 0.3f, 0.34f);     // night over the board: everything dims
+    public Color phantomTargetColor = new Color(0.62f, 0.45f, 0.9f);  // and the target goes violet; hover shows nothing
+
     public bool IsHovered => state == State.Hover || state == State.HoverTarget;
+
+    // One switch for every bulb: PhantomMode flips it, and every bulb repaints at once.
+    private static readonly List<Bulb> all = new List<Bulb>();
+    public static bool PhantomLook { get; private set; }
+    public static void SetPhantomLook(bool on)
+    {
+        if (on == PhantomLook) return;
+        PhantomLook = on;
+        foreach (Bulb b in all) b.Apply();
+    }
 
     private Renderer rend;
     private bool hasOverride;         // an override color wins over the state color until cleared (used by the sync sweep)
@@ -23,6 +38,9 @@ public class Bulb : MonoBehaviour
         rend = GetComponent<Renderer>();
         Apply();
     }
+
+    void OnEnable() { all.Add(this); }
+    void OnDisable() { all.Remove(this); }
 
     public void SetState(State s)
     {
@@ -53,6 +71,13 @@ public class Bulb : MonoBehaviour
         if (hasOverride)
         {
             rend.material.color = overrideColor;
+            return;
+        }
+
+        if (PhantomLook)
+        {
+            bool isTarget = state == State.Target || state == State.HoverTarget;
+            rend.material.color = isTarget ? phantomTargetColor : phantomIdleColor;
             return;
         }
 

@@ -103,7 +103,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
 
         // Rolling up is immediate. Unrolling waits until the palm menu is out of the way.
         bool menuOpen = menu != null && menu.IsShown;
-        if (!wanted || !menuOpen) SetUnrolled(wanted);
+        SetUnrolled(wanted);   // right away, menu up or not: the unroll is the feedback that the press landed
     }
 
     // Called by the palm menu's Parchment button (and P in the editor).

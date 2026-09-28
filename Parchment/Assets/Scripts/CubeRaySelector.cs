@@ -7,6 +7,7 @@ public class CubeRaySelector : MonoBehaviour
     public float maxDistance = 5f;
     public ParchmentHover hover;            // optional; found on this object if empty
     public ParchmentSelector parchment;     // optional; found on this object if empty
+    public ParchmentMode parchmentMode;     // drag TaskCube here; while the board is out, the cube is off limits
 
     public Color hoverColor = new Color(1f, 0.85f, 0.2f);          // same yellow as a hovered bulb
     public Color hoverTargetColor = new Color(0.6f, 1f, 0.6f);     // same pale green as a hovered target bulb
@@ -42,7 +43,8 @@ public class CubeRaySelector : MonoBehaviour
             int id = -1;
             Renderer rend = null;
             RaycastHit hit = new RaycastHit();
-            bool busy = !hand.IsTracked || hand.Resting || (hover != null && hover.IsOnSheet(hand));
+            bool busy = !hand.IsTracked || hand.Resting || (hover != null && hover.IsOnSheet(hand))
+                        || (parchmentMode != null && parchmentMode.IsOn);
             bool gotHit = false;
             if (!busy && Physics.Raycast(hand.PointerRay, out hit, maxDistance)
                 && hit.collider.name.StartsWith("Sphere_"))

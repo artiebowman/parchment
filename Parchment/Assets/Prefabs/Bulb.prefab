@@ -130,3 +130,6 @@ MonoBehaviour:
   idleColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
   targetColor: {r: 0.2, g: 0.9, b: 0.3, a: 1}
   hoverColor: {r: 1, g: 0.85, b: 0.2, a: 1}
+  hoverTargetColor: {r: 0.5, g: 1, b: 0.5, a: 1}
+  phantomIdleColor: {r: 0.3, g: 0.3, b: 0.34, a: 1}
+  phantomTargetColor: {r: 0.2901961, g: 0.17254902, b: 0.47843137, a: 1}

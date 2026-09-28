@@ -1,7 +1,8 @@
 using UnityEngine;
 
 // Phantom: a fingertip on the floating trackpad (PhantomPad) is mirrored corner-for-corner onto the bulb grid, always
-// on the bulb plane, so sliding it through a bulb pokes it. A small ghost of the real hand is drawn where it lands.
+// on the bulb plane, so sliding it through a bulb pokes it. A small ghost of the real hand is drawn where it lands,
+// and the board goes dark underneath so your eyes stay on the pad.
 public class PhantomMode : MonoBehaviour, IToggleState
 {
     [System.Serializable]
@@ -26,6 +27,11 @@ public class PhantomMode : MonoBehaviour, IToggleState
     public float ghostScale = 0.3f;     // ghost hand size, 1 = life size; shrinks around its own fingertip
     public float ghostLift = 0.01f;     // ghost fingertip drawn this far above the bulb plane so it reads as touching, not buried
 
+    [Header("Night over the board")]
+    public float shadeAlpha = 0.3f;     // a black solid at this opacity sits just above the slab while Phantom is live
+    public float shadeSize = 0.5f;      // in Sheet units; the slab is 0.5
+    public float shadeLift = 0.011f;    // just above the slab's top face, below the bulbs
+
     public bool IsOn => wanted;
     public bool Active => wanted && mode != null && mode.Ready;
 
@@ -47,9 +53,15 @@ public class PhantomMode : MonoBehaviour, IToggleState
             if (g != null && g.hand == hand) { g.shown = shown; g.phantomTip = phantomTip; }
     }
 
+    private GameObject shade;
+    private MaterialPropertyBlock mpb;
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+
     void LateUpdate()
     {
         bool active = Active;
+        Bulb.SetPhantomLook(active);   // bulbs go dark, target goes violet, hover shows nothing
+        UpdateShade(active);
         foreach (GhostHand g in hands)
         {
             if (g == null) continue;
@@ -74,5 +86,30 @@ public class PhantomMode : MonoBehaviour, IToggleState
 
             g.shown = false;   // ParchmentHover sets it again next frame
         }
+    }
+
+    // The black solid: a see-through dark quad parented to the Sheet so it rolls and unrolls with it. Shown only while live.
+    void UpdateShade(bool active)
+    {
+        if (mode == null || mode.sheet == null || ghostMaterial == null) return;
+        if (shade == null)
+        {
+            shade = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            shade.name = "NightShade";
+            Destroy(shade.GetComponent<Collider>());
+            shade.transform.SetParent(mode.sheet, false);
+            shade.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);   // lie flat, face up
+            shade.transform.localScale = new Vector3(shadeSize, shadeSize, 1f);
+            Renderer r = shade.GetComponent<Renderer>();
+            r.sharedMaterial = ghostMaterial;
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        }
+        shade.transform.localPosition = new Vector3(0f, shadeLift, 0f);
+        Renderer sr = shade.GetComponent<Renderer>();
+        if (mpb == null) mpb = new MaterialPropertyBlock();
+        sr.GetPropertyBlock(mpb);
+        mpb.SetColor(BaseColorId, new Color(0f, 0f, 0f, shadeAlpha));
+        sr.SetPropertyBlock(mpb);
+        shade.SetActive(active);
     }
 }

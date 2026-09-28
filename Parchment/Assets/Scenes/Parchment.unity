@@ -349,6 +349,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -1631,6 +1633,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -1770,6 +1774,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -2710,6 +2716,7 @@ MonoBehaviour:
   trial: {fileID: 2051825410}
   cubeRoot: {fileID: 2051825407}
   cubeSize: 1
+  parchmentMode: {fileID: 2051825416}
 --- !u!114 &824298947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2918,6 +2925,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -4018,6 +4027,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -4400,6 +4411,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0.6
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -4719,6 +4732,7 @@ MonoBehaviour:
   trial: {fileID: 2051825410}
   cubeRoot: {fileID: 2051825407}
   cubeSize: 1
+  parchmentMode: {fileID: 2051825416}
 --- !u!114 &1113013151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5189,6 +5203,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0.6
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -5870,6 +5886,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0.6
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -6009,6 +6027,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0.6
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -6329,6 +6349,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -7242,6 +7264,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.9019608, g: 0.2, b: 0.2, a: 1}
@@ -7381,6 +7405,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0.6
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -7520,6 +7546,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0.6
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}
@@ -7844,11 +7872,11 @@ GameObject:
   - component: {fileID: 2051825417}
   - component: {fileID: 2051825418}
   - component: {fileID: 2051825419}
-  - component: {fileID: 2051825421}
   - component: {fileID: 2051825420}
   - component: {fileID: 2051825423}
   - component: {fileID: 2051825422}
   - component: {fileID: 2051825424}
+  - component: {fileID: 2051825421}
   m_Layer: 0
   m_Name: TaskCube
   m_TagString: Untagged
@@ -7919,7 +7947,7 @@ MonoBehaviour:
   board: {fileID: 286203574}
   log: {fileID: 0}
   totalRuns: 7
-  practice: 0
+  practice: 1
 --- !u!114 &2051825411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7953,6 +7981,7 @@ MonoBehaviour:
   maxDistance: 5
   hover: {fileID: 2051825414}
   parchment: {fileID: 2051825415}
+  parchmentMode: {fileID: 2051825416}
   hoverColor: {r: 1, g: 0.85, b: 0.2, a: 1}
   hoverTargetColor: {r: 0.6, g: 1, b: 0.6, a: 1}
   reticleLift: 0.001
@@ -8005,6 +8034,8 @@ MonoBehaviour:
   lineGap: 0.02
   nearDistance: 0.15
   belowTolerance: 0.05
+  phantomReticleScale: 0
+  phantomReticleColor: {r: 0.6039216, g: 0.49803922, b: 0.8509804, a: 0.039215688}
 --- !u!114 &2051825415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8271,6 +8302,7 @@ MonoBehaviour:
   scanner: {fileID: 2051825413}
   parchment: {fileID: 2020093375}
   lineMaterial: {fileID: 2100000, guid: 0dbcbb6f0edeb467f9541d96d9227b5d, type: 2}
+  phantom: {fileID: 2051825422}
   handColors:
   - {r: 0.3, g: 0.65, b: 1, a: 1}
   - {r: 1, g: 0.17, b: 0.17, a: 1}
@@ -8462,6 +8494,9 @@ MonoBehaviour:
   wanted: 0
   ghostScale: 0.4
   ghostLift: 0.005
+  shadeAlpha: 0.5
+  shadeSize: 0.5
+  shadeLift: 0.011
 --- !u!114 &2051825423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8564,6 +8599,8 @@ MonoBehaviour:
   pressRadius: 0.025
   releaseRadius: 0.05
   rearmSeconds: 0.3
+  repeatAfter: 0
+  repeatEvery: 0.25
   idleColor: {r: 0.47843137, g: 0.47843137, b: 0.52156866, a: 1}
   onColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
   offColor: {r: 0.36078432, g: 0.36078432, b: 0.4, a: 1}

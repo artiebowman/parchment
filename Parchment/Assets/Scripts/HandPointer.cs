@@ -55,6 +55,7 @@ public class HandPointer : MonoBehaviour
     public TrialManager trial;
     public Transform cubeRoot;      // drag TaskCube here; beam shows when pointing into the cube's volume
     public float cubeSize = 1f;
+    public ParchmentMode parchmentMode;   // drag TaskCube here; while the board is out the beam ignores the cube
 
     private LineRenderer line;
     private bool onTarget;
@@ -120,8 +121,9 @@ public class HandPointer : MonoBehaviour
         }
 
         onTarget = false;
+        bool cubeLive = parchmentMode == null || !parchmentMode.IsOn;
         RaycastHit hit;
-        if (Physics.Raycast(PointerRay, out hit, rayLength))
+        if (cubeLive && Physics.Raycast(PointerRay, out hit, rayLength))
         {
             if (hit.collider.name.StartsWith("Sphere_"))
             {
@@ -132,7 +134,7 @@ public class HandPointer : MonoBehaviour
         }
 
         // No sphere under the ray: if the ray passes through the cube, run the beam to where it leaves the glass.
-        if (float.IsPositiveInfinity(LineClip) && cubeRoot != null)
+        if (cubeLive && float.IsPositiveInfinity(LineClip) && cubeRoot != null)
         {
             Bounds box = new Bounds(cubeRoot.position, Vector3.one * cubeSize);
             if (box.IntersectRay(PointerRay, out float enter) && enter <= rayLength)

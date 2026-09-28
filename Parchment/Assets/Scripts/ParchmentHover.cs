@@ -22,6 +22,8 @@ public class ParchmentHover : MonoBehaviour
     public float lineGap = 0.02f;       // beam stops this far short of the coin
     public float nearDistance = 0.15f;  // fingertip within this height above the sheet = near mode (ray off)
     public float belowTolerance = 0.05f; // how far below the bulb plane a finger can dip and still count
+    public float phantomReticleScale = 0.5f;   // board reticle size while Phantom drives the hand (1 = normal)
+    public Color phantomReticleColor = new Color(0.7f, 0.5f, 1f, 1f);   // and its tint
 
     // Per hand, index matches hands[]: what it's hovering (null if none) and whether it's over the sheet at all.
     private Bulb[] hovered = new Bulb[0];
@@ -32,6 +34,9 @@ public class ParchmentHover : MonoBehaviour
     private bool[] pokedThisFrame = new bool[0];
     private Bulb[] pokedBulb = new Bulb[0];
     private float[] lastHeight = new float[0];    // tip height above the plane last frame; used to refuse entry from below
+    private Vector3[] reticleScale = new Vector3[0];   // each reticle's normal look, saved on first use
+    private Color[] reticleColor = new Color[0];
+    private bool[] reticleSaved = new bool[0];
 
     // Editor mouse acts like an extra hand.
     public Bulb MouseHovered { get; private set; }
@@ -135,13 +140,14 @@ public class ParchmentHover : MonoBehaviour
             Vector3 point = Vector3.zero;
             float dist = 0f;
 
+            bool ghost = false;   // Phantom is driving this hand this frame
+            bool phantomLive = phantom != null && phantom.Active;   // Phantom on: the pad is the only way onto the sheet
             bool menuUp = menu != null && menu.IsShown;   // menu open: no reticle, hover, poke or phantom on the sheet
             if (hand != null && hand.IsTracked && !menuUp)
             {
                 hand.Resting = !sheet.GetSide(hand.PointerRay.origin);   // hand below the sheet = at rest
 
                 bool near = false;
-                bool ghost = false;   // Phantom is driving this hand this frame
 
                 // Phantom: fingertip on the trackpad maps corner-for-corner onto the bulb plane.
                 // Sliding that point through a bulb pokes it.
@@ -174,10 +180,10 @@ public class ParchmentHover : MonoBehaviour
                         lastHeight[i] = 0f;
                         phantom.Report(hand, true, tip);
                     }
-                    else phantom.Report(hand, false, Vector3.zero);
+                    else { phantom.Report(hand, false, Vector3.zero); pressing[i] = null; }
                 }
 
-                if (!ghost)
+                if (!ghost && !phantomLive)
                 {
                     if (hand.HasIndexTip)
                     {
@@ -226,7 +232,7 @@ public class ParchmentHover : MonoBehaviour
                     }
                 }
 
-                if (!near)
+                if (!near && !phantomLive)
                 {
                     hovered[i] = FindNearest(hand.PointerRay, sheet, out hit, out point, out dist);
                     if (hit) hand.LineClip = Mathf.Min(hand.LineClip, dist - lineGap);
@@ -253,6 +259,7 @@ public class ParchmentHover : MonoBehaviour
                 {
                     reticle.transform.position = point;
                     reticle.transform.rotation = parchment.rotation;
+                    StyleReticle(i, reticle, ghost);
                 }
             }
         }
@@ -291,6 +298,28 @@ public class ParchmentHover : MonoBehaviour
             bool onTarget = scanner.trial != null && scanner.trial.IsCurrentTarget(b.id);
             b.SetState(onTarget ? Bulb.State.HoverTarget : Bulb.State.Hover);
         }
+    }
+
+    // In Phantom the board reticle shrinks to just over ghost-fingertip size and goes violet; off Phantom it returns to normal.
+    void StyleReticle(int i, GameObject reticle, bool phantomStyle)
+    {
+        if (reticleSaved.Length != reticles.Length)
+        {
+            reticleScale = new Vector3[reticles.Length];
+            reticleColor = new Color[reticles.Length];
+            reticleSaved = new bool[reticles.Length];
+        }
+        Renderer r = reticle.GetComponentInChildren<Renderer>();
+        if (!reticleSaved[i])
+        {
+            reticleScale[i] = reticle.transform.localScale;
+            reticleColor[i] = r == null ? Color.white : (r is SpriteRenderer s ? s.color : r.material.color);
+            reticleSaved[i] = true;
+        }
+        reticle.transform.localScale = phantomStyle ? reticleScale[i] * phantomReticleScale : reticleScale[i];
+        if (r == null) return;
+        Color c = phantomStyle ? phantomReticleColor : reticleColor[i];
+        if (r is SpriteRenderer sr) sr.color = c; else r.material.color = c;
     }
 
     bool InsideSheet(Vector3 worldPoint)
