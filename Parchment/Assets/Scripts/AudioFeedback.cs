@@ -63,6 +63,7 @@ public class AudioFeedback : MonoBehaviour
         if (ding != null) source.PlayOneShot(ding, dingVolume);
     }
 
+    // ---- Synthesised sounds: sine wave x attack envelope x decay envelope, sampled into an array. No audio files ----
     // Raised-cosine fade to zero over the last `portion` of a clip, so nothing ends on a snap.
     static float Tail(float u, float portion)
     {

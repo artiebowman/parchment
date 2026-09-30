@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class TrialManager : MonoBehaviour, IToggleState
 {
+    // The referee. Owns the sequence, the current target index, the clock, and the practice flag.
+    // The clock starts on the first correct selection, not on run start: setup time is free. A wrong sphere is logged and ignored, no penalty.
+    // IsCurrentTarget is the one target read feedback scripts use. Selection scripts never call it.
+    // ---- State ----
     private SequenceLoader loader;
     private int[] sequence;
     private int currentIndex = 0;
@@ -12,6 +16,7 @@ public class TrialManager : MonoBehaviour, IToggleState
     private Renderer currentTarget;
     private Color originalColor;
 
+    // ---- Wiring and knobs ----
     public Scoreboard board;
     public RunLog log;                  // optional: the run-by-run list beside the cube
     public int totalRuns = 7;
@@ -20,6 +25,7 @@ public class TrialManager : MonoBehaviour, IToggleState
     public bool HasStarted => hasStarted;   // false until run 1 begins; CubeRaySelector asks for a double pinch until then
 
     // IToggleState for the Practice button.
+    // ---- Practice: snapshotted at run start, so flipping it mid-run does not change what that run was ----
     public bool IsOn => practice;
     public void TogglePractice() { practice = !practice; }
 

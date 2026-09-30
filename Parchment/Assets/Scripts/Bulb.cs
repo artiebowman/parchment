@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Bulb : MonoBehaviour
 {
+    // One bulb: its sphere id and its paint job. State picks the colour; an override (sync flare) beats state; PhantomLook swaps the whole palette to the dark board.
     public enum State { Idle, Target, Hover, HoverTarget }
 
     public int id;
@@ -29,6 +30,7 @@ public class Bulb : MonoBehaviour
         foreach (Bulb b in all) b.Apply();
     }
 
+    // ---- Paint state ----
     private Renderer rend;
     private bool hasOverride;         // an override color wins over the state color until cleared (used by the sync sweep)
     private Color overrideColor;

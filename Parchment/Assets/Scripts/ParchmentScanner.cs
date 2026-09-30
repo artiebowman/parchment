@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ParchmentScanner : MonoBehaviour
 {
+    // The one-time projection: at Start, every Sphere_N under TaskCube becomes a bulb on a 10x10 grid, laid out by sorted id.
+    // Maps by layout, never by sequence: it does not know which sphere is next. After Start it only does feedback (which bulb is the target).
     public Transform taskCube;      // drag TaskCube here
     public Transform bulbParent;    // drag Bulbs here
     public GameObject bulbPrefab;   // drag the Bulb prefab here

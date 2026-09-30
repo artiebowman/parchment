@@ -3,6 +3,7 @@ using TMPro;
 
 public class Scoreboard : MonoBehaviour
 {
+    // The text above the cube: progress during a run, time on completion, a prompt between runs.
     public TMP_Text text;
 
     public void ShowProgress(int run, int targetIndex, int total, bool practice = false)

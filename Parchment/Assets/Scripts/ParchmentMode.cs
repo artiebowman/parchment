@@ -7,12 +7,15 @@ using UnityEngine.InputSystem;
 
 public class ParchmentMode : MonoBehaviour, IToggleState
 {
+    // The board's on/off switch and its unroll animation. Two flags everyone watches: IsOn (button pressed, board wanted) and Ready (animation landed, board usable).
+    // Mode ladder rung 1: while IsOn, the cube is off limits (HandPointer and CubeRaySelector both check it).
+    // Animation model: one progress value 0..1 is the playhead; every AnimationCurve below reads it and returns its own real-unit value. ApplyPose is the frame.
     public enum BulbOrder { Id, LeftToRight, CenterOut }
 
     public GameObject parchment;        // drag Parchment here
     public ParchmentHover hover;        // drag TaskCube here
     public ParchmentSelector selector;  // drag TaskCube here
-    public PalmMenu menu;               // drag the PalmMenu object here; unrolling waits until it closes
+    public PalmMenu menu;               // drag the PalmMenu object here (kept for reference; unroll no longer waits for it)
 
     [Header("Unroll animation")]
     public Transform sheet;             // drag Parchment > Sheet here: the pivot null holding Slab, Bulbs and the reticles
@@ -46,7 +49,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
     // Fired as each bulb pops in. The first-unroll sync sweep hooks this to flash the matching sphere.
     public event System.Action<Transform> BulbShown;
 
-    // What the sheet should be. Same as Unrolled unless an unroll is waiting for the menu to close.
+    // What the sheet should be. Set by the button; Update makes Unrolled catch up to it.
     private bool wanted;
 
     // IToggleState: the button shows what was asked for, so it turns green the moment you press it.
@@ -101,7 +104,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
 
         if (wanted == Unrolled) return;
 
-        // Rolling up is immediate. Unrolling waits until the palm menu is out of the way.
+        // Both directions start immediately. The unroll starting is the feedback that the button press landed.
         bool menuOpen = menu != null && menu.IsShown;
         SetUnrolled(wanted);   // right away, menu up or not: the unroll is the feedback that the press landed
     }
@@ -139,6 +142,7 @@ public class ParchmentMode : MonoBehaviour, IToggleState
         anim = StartCoroutine(value ? Unroll() : RollUp());
     }
 
+    // ---- Coroutines: each one runs across many frames, pausing at every yield return null ----
     // Sheet opens. Before the sync, bulbs pop in staggered once progress passes bulbsStartAt; after it, they ride the sheet.
     IEnumerator Unroll()
     {

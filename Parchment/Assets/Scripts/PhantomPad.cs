@@ -23,6 +23,7 @@ public class PhantomPad : MonoBehaviour
     public float lineWidth = 0.002f;   // finger-to-target guide line
     public Color lineColor = new Color(1f, 0.85f, 0.2f, 1f);         // finger-to-target guide line: warm yellow
 
+    // ---- Drawn parts: wire box, finger dots, mirrored bulb dots, guide line. All feedback ----
     private MeshFilter filter;
     private MeshRenderer rend;
     private LineRenderer line;
@@ -55,6 +56,8 @@ public class PhantomPad : MonoBehaviour
         line.enabled = false;
     }
 
+    // No gain, by design: dividing by half the pad width means the pad edge is always +1, whatever the pad size. PhantomMode.OnBoard multiplies by half the board.
+    // Shrink the pad and the same board takes less finger travel. Sensitivity is pad size, nothing else.
     // Fingertip in; its spot on the pad out, -1..1 across and -1..1 up the pad. False when the finger isn't over the pad.
     public bool TryMap(Vector3 fingertip, out Vector2 uv)
     {

@@ -6,11 +6,14 @@ public class HandPointer : MonoBehaviour
     // Shared by all hands: no pinch counts as a confirm until this time. PalmMenu pushes it forward while open.
     public static float SuppressConfirmUntil = float.NegativeInfinity;
 
+    // ---- Meta hand handles: both live on this same object, bound once in Awake / FindBones ----
     private OVRHand hand;
     private OVRSkeleton skeleton;
+    // Four bones we care about. Index tip drives every touch on the board and the pad; the other three define the palm plane for the menu.
     private Transform indexTip;
     private Transform wristBone, indexKnuckle, littleKnuckle;   // palm
 
+    // ---- Outputs: written here every frame, read by everyone else. NonSerialized = hidden from the Inspector, it's a result not a knob ----
     [System.NonSerialized] public Ray PointerRay;
     public bool ConfirmedThisFrame;
     [System.NonSerialized] public float PinchStrength;   // index-thumb pinch, 0..1, this frame
@@ -33,6 +36,7 @@ public class HandPointer : MonoBehaviour
     public bool flipPalmNormal;                          // tick on whichever hand comes out mirrored
     [Range(0f, 1f)] public float palmUpThreshold = 0.7f; // 1 = dead flat, lower = more forgiving
 
+    // ---- Inputs: other scripts write these during their Update; the beam reads them in LateUpdate. Reset every frame ----
     // Others can shorten the drawn line this frame (e.g. hover sets it to the sheet hit). Reset every frame.
     // Infinity means nothing clipped it, and the beam is not drawn.
     [System.NonSerialized] public float LineClip = float.PositiveInfinity;
@@ -40,19 +44,23 @@ public class HandPointer : MonoBehaviour
     // Set each frame by ParchmentHover/PalmMenu: true when the hand is at rest or busy with the menu. Beam hidden.
     [System.NonSerialized] public bool Resting;
 
+    [Header("Pinch")]
+    // Hysteresis: on at 0.8, off below 0.5. A hand wobbling near the line fires once, not five times. The gap swallows the jitter.
     [Range(0f, 1f)] public float pinchOnThreshold = 0.8f;
     [Range(0f, 1f)] public float pinchOffThreshold = 0.5f;
     public float cooldownSeconds = 0.15f;
     public float doublePinchWindow = 0.45f;   // second pinch must land within this of the first to count as a double
     public bool requireHighConfidence = true;   // ignore pinches from a poorly tracked hand
 
+    // ---- Pinch state: private bookkeeping carried between frames ----
     private bool isPinching;
     private float nextAllowedTime;
     private float lastConfirmTime = float.NegativeInfinity;
 
+    [Header("Beam and wiring")]
     public Material rayMaterial;
     public float rayLength = 2f;
-    public TrialManager trial;
+    public TrialManager trial;      // feedback only: colours the beam green on the current target. Selection never reads this.
     public Transform cubeRoot;      // drag TaskCube here; beam shows when pointing into the cube's volume
     public float cubeSize = 1f;
     public ParchmentMode parchmentMode;   // drag TaskCube here; while the board is out the beam ignores the cube
@@ -75,6 +83,7 @@ public class HandPointer : MonoBehaviour
 
     void Update()
     {
+        // Nothing by default. Every output starts cleared each frame; the code below earns each one back.
         ConfirmedThisFrame = false;
         DoublePinchedThisFrame = false;
         LineClip = float.PositiveInfinity;
@@ -155,6 +164,7 @@ public class HandPointer : MonoBehaviour
         PinchStrength = strength;
         bool suppressed = Time.time < SuppressConfirmUntil;   // menu is up (or just closed): pinches are not confirms
 
+        // One pinch, one confirm. Hysteresis + cooldown + menu suppression. Everything downstream trusts this block.
         if (!isPinching)
         {
             if (confident && strength >= pinchOnThreshold && Time.time >= nextAllowedTime)

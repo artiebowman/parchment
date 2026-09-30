@@ -32,6 +32,7 @@ public class PhantomMode : MonoBehaviour, IToggleState
     public float shadeSize = 0.5f;      // in Sheet units; the slab is 0.5
     public float shadeLift = 0.011f;    // just above the slab's top face, below the bulbs
 
+    // IsOn = the button. Active = the button AND the board has finished unrolling. Everything downstream checks Active, so pressing Phantom mid-roll just waits.
     public bool IsOn => wanted;
     public bool Active => wanted && mode != null && mode.Ready;
 
@@ -53,6 +54,7 @@ public class PhantomMode : MonoBehaviour, IToggleState
             if (g != null && g.hand == hand) { g.shown = shown; g.phantomTip = phantomTip; }
     }
 
+    // ---- Visuals: dark palette, shade quad, violet real hand, ghost hand drawn as a baked mesh each frame ----
     private GameObject shade;
     private MaterialPropertyBlock mpb;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");

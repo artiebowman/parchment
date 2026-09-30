@@ -10,6 +10,8 @@ public interface IToggleState
 
 public class MenuButton : MonoBehaviour
 {
+    // A button is a fingertip inside a bubble. pressRadius in, releaseRadius out, plus rearmSeconds: hysteresis in space, same shape as the pinch.
+    // Optional layers: enableSource grays it out, holdSeconds fills a ring before firing, repeatAfter auto-repeats. onPress is the Inspector wiring to the action.
     public float pressRadius = 0.025f;       // fingertip within this of the button center = pressing
     public float releaseRadius = 0.05f;      // once pressed, the tip must get this far away to re-arm (punch-through stays inside)
     public float rearmSeconds = 0.3f;        // and this long must have passed since the press

@@ -247,6 +247,7 @@ public class SyncSweep : MonoBehaviour
         }
     }
 
+    // ---- Synthesised sounds: sine wave x attack envelope x decay envelope, sampled into an array. No audio files ----
     // A 40 ms sine blip with a fast decay, made in code so no audio asset is needed.
     AudioClip MakeTick()
     {

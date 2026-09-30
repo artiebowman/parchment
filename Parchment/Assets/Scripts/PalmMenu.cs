@@ -3,6 +3,8 @@ using UnityEngine;
 [DefaultExecutionOrder(-40)]   // after ParchmentHover (-50), before ParchmentSelector (-10) and CubeRaySelector (0): Resting set here is the last word
 public class PalmMenu : MonoBehaviour
 {
+    // Left palm up (below the eyes, within reach) opens the panel after showDelay; dropped for hideDelay closes it. Hysteresis in time.
+    // While the pose is held or the panel is up, HandPointer.SuppressConfirmUntil is pushed forward so no pinch counts as a confirm. Only the right hand presses.
     public HandPointer menuHand;    // drag the LEFT hand here
     public HandPointer pressHand;   // drag the RIGHT hand here
     public Transform head;          // drag CenterEyeAnchor here
@@ -17,7 +19,7 @@ public class PalmMenu : MonoBehaviour
     public float followSpeed = 10f;
     [Range(0f, 1f)] public float palmToFaceThreshold = 0.5f;   // palm turned this much toward the head hides its beam
 
-    // True while the panel is visible. Others (ParchmentMode) defer actions until this drops.
+    // True while the panel is visible. ParchmentHover reads it to keep hands off the sheet.
     public bool IsShown => shown;
 
     private float upSince = -1f;

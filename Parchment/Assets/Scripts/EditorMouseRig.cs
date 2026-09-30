@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class EditorMouseRig : MonoBehaviour
 {
+    // Editor only: the mouse stands in for a hand so the task can be tested without a headset. Disables itself in a build.
     private Camera cam;
     private TrialManager trial;
     private ParchmentHover hover;

@@ -3,6 +3,7 @@ using System.IO;
 
 public class SphereLoader : MonoBehaviour
 {
+    // Reads Resources/sphere_coordinates.txt and builds the 100 spheres under TaskCube, named Sphere_N. Everything else finds them by that name.
     public Material sphereMaterial;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class SequenceLoader : MonoBehaviour
 {
+    // Reads Resources/test_sequences.txt: one run per line, seven comma-separated sphere ids. GetSequence returns the row for runNumber.
+    // Swap the file, keep the name, rebuild. testMode = random sequences for an unscripted demo.
     [Range(1, 7)]
     public int runNumber = 1;
     public bool testMode = false;

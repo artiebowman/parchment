@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ParchmentTether : MonoBehaviour
 {
+    // Feedforward: a line from the nearer hand's reticle to the target bulb. Fades with distance, hides when close, hides under Phantom (the pad has its own).
     public ParchmentHover hover;        // drag TaskCube here
     public ParchmentScanner scanner;    // drag TaskCube here
     public Transform parchment;         // drag Parchment here

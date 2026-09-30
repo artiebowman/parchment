@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 [DefaultExecutionOrder(-10)]   // before CubeRaySelector, so "pinch to continue" can't also select here
 public class ParchmentSelector : MonoBehaviour, IToggleState
 {
+    // The only place a board touch becomes a selection. Pinch selects the hovered bulb; poke selects the bulb just entered.
+    // Ladder rung 4: Phantom live forces poke on and ignores pinch. Every selection goes through Send, once.
     public HandPointer[] hands;     // drag both hand objects here
     public ParchmentHover hover;    // drag TaskCube here
     public TrialManager trial;      // drag TaskCube here

@@ -3,6 +3,7 @@ using UnityEngine;
 [DefaultExecutionOrder(-90)]   // after HandPointer (-100) so PalmUp is fresh
 public class HandTint : MonoBehaviour
 {
+    // Hand outline colour: blue with the palm up (menu coming), violet while Phantom is live, white otherwise. Blended, not switched.
     public HandPointer pointer;        // leave empty; found on this object
     public Renderer handRenderer;      // drag this hand object here; picks its Skinned Mesh Renderer
     public Color idleColor = Color.white;

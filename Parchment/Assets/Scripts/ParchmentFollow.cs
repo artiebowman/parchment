@@ -3,6 +3,7 @@ using UnityEngine;
 [DefaultExecutionOrder(-60)]   // before ParchmentHover (-50), so hover reads this frame's pose
 public class ParchmentFollow : MonoBehaviour
 {
+    // Keeps the board ahead of the body: head forward flattened to the floor, fixed distance and height, tilted back. Glides so jitter never shakes it; snaps on unroll.
     public Transform parchment;     // drag Parchment here
     public Transform head;          // drag CenterEyeAnchor here (falls back to Camera.main)
 

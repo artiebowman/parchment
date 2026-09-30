@@ -7,6 +7,11 @@ using UnityEngine.InputSystem;
 [DefaultExecutionOrder(-50)]
 public class ParchmentHover : MonoBehaviour
 {
+    // How a hand touches the board. Every frame, per hand, one of three paths: Phantom (pad maps the tip onto the bulb plane),
+    // near (tip within nearDistance projects straight down; entering a bulb's ball is a poke), or far (hand ray hits the plane, hover only).
+    // Mode ladder rungs 2 and 3: Phantom active skips near and far entirely; menu open skips everything.
+    // Selection here is geometry only. The target is read once at the bottom, for colour.
+    // ---- Wiring and knobs ----
     public HandPointer[] hands;         // drag Left then Right hand objects here
     public GameObject[] reticles;       // drag Reticle_L then Reticle_R here (same order as hands)
     public Transform parchment;         // drag Parchment here
@@ -25,6 +30,7 @@ public class ParchmentHover : MonoBehaviour
     public float phantomReticleScale = 0.5f;   // board reticle size while Phantom drives the hand (1 = normal)
     public Color phantomReticleColor = new Color(0.7f, 0.5f, 1f, 1f);   // and its tint
 
+    // ---- Per-hand state, index matches hands[] ----
     // Per hand, index matches hands[]: what it's hovering (null if none) and whether it's over the sheet at all.
     private Bulb[] hovered = new Bulb[0];
     private bool[] onSheet = new bool[0];
@@ -38,6 +44,7 @@ public class ParchmentHover : MonoBehaviour
     private Color[] reticleColor = new Color[0];
     private bool[] reticleSaved = new bool[0];
 
+    // ---- Public queries: other scripts ask "what is this hand doing on the sheet?" ----
     // Editor mouse acts like an extra hand.
     public Bulb MouseHovered { get; private set; }
 
@@ -85,6 +92,7 @@ public class ParchmentHover : MonoBehaviour
         return MouseHovered != null;
     }
 
+    // ---- Lifecycle ----
     void OnEnable()
     {
         ResetArrays();
@@ -300,6 +308,7 @@ public class ParchmentHover : MonoBehaviour
         }
     }
 
+    // ---- Helpers ----
     // In Phantom the board reticle shrinks to just over ghost-fingertip size and goes violet; off Phantom it returns to normal.
     void StyleReticle(int i, GameObject reticle, bool phantomStyle)
     {
