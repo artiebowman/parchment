@@ -4,13 +4,13 @@ A 3D selection technique for the Meta Quest 3S, hands only. Turn a hard 3D point
 
 *[GIF here: one Phantom run, start to seventh sphere, about 10 seconds. Recorded from the headset after the showcase.]*
 
-<br>
-
 ---
 
 ## The Task
 
 The assignment is a 3D selection task on the Quest 3S, hands only. A one-meter glass cube holds 100 small spheres at fixed positions. Each run lights up seven of them in sequence, one at a time, and the clock runs from the first correct selection to the seventh. Seven runs, and the average time is the score. The cube cannot be moved or scaled, every sphere has to be equally selectable, and one action has to select exactly one sphere.
+
+---
 
 ## Solution and Thought Process
 
@@ -27,8 +27,6 @@ Parchment worked, so I kept iterating. Even on a flat panel the hand has to trav
 The last idea was the grenade, which came from mixing the nuclear option with the rules Parchment and Phantom already lived inside. It would have been the fastest thing I built. It also would have been one action selecting many, so it stayed on paper. Phantom is what shipped.
 
 Every layer roughly halved the time. Hand ray to Parchment, then Parchment to Phantom. Live runs are consistently under 3 seconds, the best is 2.17, and the seven-run average is around 2.6.
-
-<br>
 
 ---
 
@@ -60,8 +58,6 @@ Settings: Dist and Tilt move the board, Pad resizes the trackpad, Mute, Reset.
 | Board out | Touch or ray on the board. Cube is off |
 | Phantom on | Trackpad only. Board touch, ray, and tether are off |
 | Menu open | Nothing on the board reacts |
-
-<br>
 
 ---
 
@@ -97,8 +93,6 @@ The scripts, in the order a selection flows through them:
 
 One pattern shows up everywhere: hysteresis. The pinch turns on at 0.8 and off at 0.5. A poke enters at one radius and leaves at a larger one. The menu opens after a quarter second palm-up and closes after 0.4 seconds down. Two thresholds instead of one, so noise near the line never retriggers anything.
 
-<br>
-
 ---
 
 ## Where It Stands
@@ -113,15 +107,11 @@ Shipped for the HW1 showcase on September 30, 2026, after about two weeks of eve
 
 **Next.** Fix the hang. Record the GIF. Then user-test Phantom's pad width with people who are not me, since my wife found it hard on first contact and I tuned it to my own hand.
 
-<br>
-
 ---
 
 ## AI Disclosure
 
 This is my first Unity project and my first C#. I used Claude throughout as a tutor and a coding partner. The design, the rules, every decision in `docs/DECISIONS.md`, the user testing, and the tuning are mine. The C# was written with Claude alongside, one piece at a time: I described what I wanted, Claude explained the Unity and C# needed to do it and drafted the code, and I reviewed, tested on the headset, and directed each change. I did not hand the assignment to an AI and take the output. Claude Code was used for documentation only. I can walk through any script in the project and say what it does and why it is there.
-
-<br>
 
 ---
 
