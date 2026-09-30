@@ -12,8 +12,6 @@ The assignment is a 3D selection task on the Quest 3S, hands only. A one-meter g
 
 ---
 
----
-
 ## Solution and Thought Process
 
 I started by reading the task for opportunities rather than for the obvious answer. Two things stood out. The clock does not start until the first correct selection, so any time spent before that is free. And the cube is fixed, but nothing in the rules says I cannot make a copy of it.
