@@ -6,9 +6,13 @@ A 3D selection technique for the Meta Quest 3S, hands only. Turn a hard 3D point
 
 ---
 
+<br>
+
 ## The Task
 
 The assignment is a 3D selection task on the Quest 3S, hands only. A one-meter glass cube holds 100 small spheres at fixed positions. Each run lights up seven of them in sequence, one at a time, and the clock runs from the first correct selection to the seventh. Seven runs, and the average time is the score. The cube cannot be moved or scaled, every sphere has to be equally selectable, and one action has to select exactly one sphere.
+
+<br>
 
 ## Solution and Thought Process
 
@@ -27,6 +31,8 @@ The last idea was the grenade, which came from mixing the nuclear option with th
 Every layer roughly halved the time. Hand ray to Parchment, then Parchment to Phantom. Live runs are consistently under 3 seconds, the best is 2.17, and the seven-run average is around 2.6.
 
 ---
+
+<br>
 
 ## How to Use Parchment
 
@@ -48,6 +54,8 @@ Settings: Dist and Tilt move the board, Pad resizes the trackpad, Mute, Reset.
 
 **Only one surface takes input at a time.** This is deliberate. Hands are cheap to trigger, and without this rule a finger reaching for the pad would poke the board on the way.
 
+<br>
+
 | State | What works |
 |---|---|
 | Board rolled up | Hand ray and pinch on the cube |
@@ -56,6 +64,8 @@ Settings: Dist and Tilt move the board, Pad resizes the trackpad, Mute, Reset.
 | Menu open | Nothing on the board reacts |
 
 ---
+
+<br>
 
 ## How It's Built
 
@@ -66,6 +76,8 @@ Three rules the code lives inside, from the assignment: one action selects one s
 **Optimized for time, not accuracy.** The assignment scores time, and a wrong selection costs nothing. So the design leans into that: sliding a finger across the board pokes every bulb on the way, and Phantom does the same on the pad. The log fills with "wrong sphere" lines during a good run, and that is by design. If the rules ever changed to penalize misses, the fallback is already built. Poke can be turned off in the menu, and the board then works on hover and pinch only, one deliberate confirm per sphere. Phantom is poke-only by design, so that fallback lives on the board, not the pad.
 
 The scripts, in the order a selection flows through them:
+
+<br>
 
 | Script | Job |
 |---|---|
@@ -89,6 +101,8 @@ One pattern shows up everywhere: hysteresis. The pinch turns on at 0.8 and off a
 
 ---
 
+<br>
+
 ## Where It Stands
 
 Shipped for the HW1 showcase on September 30, 2026, after about two weeks of evenings. First Unity project.
@@ -103,11 +117,15 @@ Shipped for the HW1 showcase on September 30, 2026, after about two weeks of eve
 
 ---
 
+<br>
+
 ## AI Disclosure
 
 This is my first Unity project and my first C#. I used Claude throughout as a tutor and a coding partner. The design, the rules, every decision in `docs/DECISIONS.md`, the user testing, and the tuning are mine. The C# was written with Claude alongside, one piece at a time: I described what I wanted, Claude explained the Unity and C# needed to do it and drafted the code, and I reviewed, tested on the headset, and directed each change. I did not hand the assignment to an AI and take the output. Claude Code was used for documentation only. I can walk through any script in the project and say what it does and why it is there.
 
 ---
+
+<br>
 
 ## More
 
