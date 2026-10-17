@@ -8368,7 +8368,7 @@ MonoBehaviour:
   board: {fileID: 286203574}
   log: {fileID: 326610021}
   totalRuns: 7
-  practice: 0
+  practice: 1
 --- !u!114 &2051825411
 MonoBehaviour:
   m_ObjectHideFlags: 0
